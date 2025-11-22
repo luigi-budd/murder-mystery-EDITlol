@@ -67,6 +67,7 @@ end,MT_PLAYER)
 addHook("MobjDeath", function(target, inflictor, source, dmgt)
 	if not MM:isMM() then return end
 	if MM:pregame() then return end
+	if MM_N.waiting_for_players then return end
 
 	local gt = MM.returnGametype()
 	
