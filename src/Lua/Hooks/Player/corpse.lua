@@ -33,6 +33,7 @@ end
 
 addHook("ShouldDamage", function(me, inf, sor, d, dmgt)
 	if not MM:isMM() then return end
+	if (dmgt & DMG_DEATHMASK) then return end
 	if MM:pregame() then return false; end
 	
 	local hook_event = MM.events["ShouldDamage"]
@@ -43,7 +44,6 @@ addHook("ShouldDamage", function(me, inf, sor, d, dmgt)
 		end
 	end
 
-	if (dmgt & DMG_DEATHMASK) then return end
 	
 	local p = me.player
 	if (p.powers[pw_flashing]) then return end
