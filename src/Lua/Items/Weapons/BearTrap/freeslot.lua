@@ -71,21 +71,20 @@ addHook("MobjThinker",function(trap)
 		trap.flags = $|MF_SPECIAL
 	end
 	
-	if trap.tracer and trap.tracer.valid
-	and trap.tracer.player and trap.tracer.player.valid then
+	if trap.tracer_player and trap.tracer_player.valid
 		if not trap.target then
 			if (displayplayer and displayplayer.valid)
 				local hide = false
 				if (displayplayer.mm)
 					if (displayplayer.spectator or displayplayer.mm.spectator)
 						hide = false
-					elseif (displayplayer.mm.role ~= trap.tracer.player.mm.role)
+					elseif (displayplayer.mm.role ~= trap.tracer_player.mm.role)
 						hide = true
 					end
 				else
 					hide = true
 				end
-
+				
 				trap.flags2 = ($ &~MF2_DONTDRAW)|(hide and MF2_DONTDRAW or 0)
 			end
 		else
@@ -133,7 +132,7 @@ addHook("TouchSpecial",function(mine,me)
 	
 	--dont kill our teammates lol
 	local isTeamMate = (p.mm.role == MMROLE_MURDERER
-	and mine.tracer.player.mm.role == MMROLE_MURDERER)
+	and mine.tracer_player.mm.role == MMROLE_MURDERER)
 	and (me ~= mine.tracer)
 	
 	/*
@@ -194,11 +193,13 @@ addHook("TouchSpecial",function(mine,me)
 	end
 
 	for player in players.iterate
+		if player.spectator then continue end
+		
 		local showme = false
-		if (mine.tracer and mine.tracer.player)
-			if mine.tracer.player == player
+		if (mine.tracer_player)
+			if mine.tracer_player == player
 				showme = true
-			elseif player.mm.role == mine.tracer.player.mm.role
+			elseif player.mm.role == mine.tracer_player.mm.role
 				showme = true
 			end
 		end
