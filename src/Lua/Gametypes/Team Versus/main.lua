@@ -34,6 +34,9 @@ local teamversus_mode = MM.RegisterGametype("Team Versus", {
 	*/
 })
 
+local dohitmarker = 0
+sfxinfo[freeslot("sfx_hitmrk")].caption = "Hitmarker"
+
 local ANIM = 2*TICRATE
 local FADEIN = 6
 local msgstatus = {
@@ -65,6 +68,14 @@ MM.addHook("KilledPlayer", function(attacking_p, player)
 	if gt.name ~= "Team Versus" then return end
 	--if MM_N.time > 90*TICRATE then return end
 	
+	if (consoleplayer and consoleplayer.valid)
+	and (attacking_p and attacking_p.valid)
+	and (consoleplayer == attacking_p)
+		dohitmarker = 8
+		S_StartSound(nil, sfx_hitmrk, consoleplayer)
+		S_StartSoundAtVolume(nil, sfx_hitmrk, 255/2, consoleplayer) --Bruh
+	end
+	
 	ShowStandings()
 end)
 
@@ -72,6 +83,19 @@ local byteLUT = {}
 for i = 26, 126
 	byteLUT[i] = ("%.3d"):format(i)
 end
+
+MMHUD.addHud("TVS_Hitmarker", false,false, function(v,p,c)
+	if not dohitmarker then return end
+	if c.chase then return end
+	
+	local alpha = 0
+	if dohitmarker < 5
+		alpha = (10 - (2 * dohitmarker))<<V_ALPHASHIFT
+	end
+	
+	v.drawScaled(160*FU,100*FU, FU/4, v.cachePatch("MM_HITMARK"),alpha, v.getColormap(nil, p.skincolor,nil))
+	dohitmarker = $ - 1
+end, "game")
 
 MMHUD.addHud("TVS_VsCount", false,false, function(v,p,c)
 	local gt = MM.returnGametype()
