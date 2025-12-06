@@ -522,8 +522,9 @@ addHook("ThinkFrame", function()
 			MM.tryRunHook("CorpseThink", v,
 				corpse
 			)
+			-- hook removed our mobj
+			if not (corpse and corpse.valid) then return end
 		end
-		if not (corpse and corpse.valid) then return end
 		
         if MM_N.gameover then break end
 		
