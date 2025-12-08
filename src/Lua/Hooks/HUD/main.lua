@@ -282,7 +282,7 @@ addHook("HUD", function(v,p,c)
 		if alpha >= 10 then return end
 		flags = ($ &~V_ALPHAMASK)|(alpha << V_ALPHASHIFT)
 		
-		v.drawScaled(x,y,scale,patch,flags,cmap,translation)
+		v.drawScaled(x,y,scale,patch,flags,cmap)
 	end
 	v.slideDrawScaled = function(x,y,scale,patch,flags,cmap)
 		v.slideDrawScaled2(x,y,scale,patch,flags,cmap,false)
@@ -292,9 +292,25 @@ addHook("HUD", function(v,p,c)
 	end
 	
 	--wrapper
+	v.slideDrawCropped2 = function(x,y,hscale,yscale,patch,flags,cmap, sx,sy,w,h, weapons)
+		local x2,y2,alpha = SlideTemplate(x,y,flags,weapons)
+		x,y = x2,y2
+		if alpha >= 10 then return end
+		flags = ($ &~V_ALPHAMASK)|(alpha << V_ALPHASHIFT)
+		
+		v.drawCropped(x,y,hscale,yscale,patch,flags,cmap,sx,sy,w,h)
+	end
+	v.slideDrawCropped = function(x,y,hscale,yscale,patch,flags,cmap, sx,sy,w,h)
+		v.slideDrawCropped2(x,y,hscale,yscale,patch,flags,cmap, sx,sy,w,h,false)
+	end
+	v.WslideDrawCropped = function(x,y,hscale,yscale,patch,flags,cmap, sx,sy,w,h)
+		v.slideDrawCropped2(x,y,hscale,yscale,patch,flags,cmap, sx,sy,w,h,true)
+	end
+
+	--wrapper
 	v.slideDrawString2 = function(x,y,str,flags,align,fixed, weapons)
 		if fixed == nil then fixed = true end
-		str = $ or ""
+		if str == nil then str = ""; end
 		-- align = $ or (fixed and "fixed" or "left")
 		if not fixed
 			x = $*FU

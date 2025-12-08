@@ -6,10 +6,12 @@ local function HUD_RoleDrawer(v,p)
 	if not (p.mm and roles[p.mm.role]) then return end
 	if (p.mm_save.afkmode and p.spectator) then return end
 	
+	local gt = MM.returnGametype()
 	--we have enough screen space
 	if v.width() >= 800
 	--the game would squish the text to illegibility
 	and not splitscreen
+	and not gt.force_small_role_hud
 		MMHUD.HUD_RoleDrawer(v,p)
 		return
 	end
@@ -39,6 +41,7 @@ local function HUD_RoleDrawer(v,p)
 	
 	if leveltime <= MM_N.pregame_time*2
 	and not splitscreen
+	and not gt.force_small_role_hud
 		v.slideDrawString(320*FU,
 			8*FU,
 			"Press TAB to view more",

@@ -26,9 +26,14 @@ addHook("PlayerThink", function(p)
 	if not (p.mo and p.mo.valid and p.mo.health) then
 		if (p.deadtimer >= 3*TICRATE
 		and p.playerstate == PST_DEAD)
-		and not MM_N.allow_respawn
 			G_DoReborn(#p)
+			P_ResetPlayer(p)
+			P_MovePlayer(p)
+			if (p.mo and p.mo.valid)
+				p.mo.state = S_PLAY_STND
+			end
 			p.deadtimer = 0
+			return
 		end
 		
 		p.mm.oob_ticker = 0

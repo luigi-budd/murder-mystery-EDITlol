@@ -3,6 +3,14 @@ return function(self)
 		return false
 	end
 	
+	local gt = MM.returnGametype()
+	if gt.canGameEnd ~= nil
+		local canend, endtype = gt.canGameEnd()
+		if canend ~= nil
+			return canend, endtype
+		end
+	end
+
 	local innocent = false
 	local murderer = false
 

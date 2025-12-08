@@ -506,7 +506,7 @@ addHook("ThinkFrame", function()
 		end
 		
 		if (player and player.valid and not player.spectator
-		and player.mo and player.mo.valid and not player.mo.health)
+		and player.mo and player.mo.valid and not player.mo.health and player.playerstate == PST_DEAD)
 			player.mo.flags2 = $|MF2_DONTDRAW
 			
 			P_MoveOrigin(player.mo, corpse.x,corpse.y,corpse.z)
