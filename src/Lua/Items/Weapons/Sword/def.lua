@@ -15,7 +15,7 @@ weapon.state = dofile "Items/Weapons/Sword/freeslot"
 weapon.timeleft = -1
 weapon.hit_time = 2
 weapon.animation_time = TICRATE + TICRATE/2
-weapon.cooldown_time = 2*TICRATE
+weapon.cooldown_time = TICRATE
 weapon.range = FU*5
 --you should be able to jump over and juke the murderer
 weapon.zrange = FU*3/4
@@ -61,8 +61,6 @@ local function LungeThink(item,p)
 			me.flags = $ &~MF_NOGRAVITY
 		end
 	end
-	
-
 end
 weapon.thinker = function(item, p)
 	if not (p and p.valid) then return end
@@ -139,6 +137,7 @@ weapon.attack = function(item,p)
 	
 	if lunge
 		item.lungetime = TICRATE/2
+		item.cooldown = 2*TICRATE
 	end
 	
 	MM.MeleeWhiffFX(p)
