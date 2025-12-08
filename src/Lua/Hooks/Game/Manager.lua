@@ -59,9 +59,9 @@ end)
 -- Restore Skin
 addHook("PlayerSpawn", function(player)
 	if not MM:isMM() then return end
+	if not (player.mm) then return end
 
-	if player.mm
-	and player.mm.spectator
+	if player.mm.spectator
 		if not MM_N.allow_respawn then
 			player.spectator = true
 		else
@@ -70,8 +70,6 @@ addHook("PlayerSpawn", function(player)
 	end
 
 	if player.mo and player.mo.valid then
-		if not (player.mm) then return end
-		
 		if not player.spectator and MM:pregame() then
 			if player.mm_save.swapped then
 				R_SetPlayerSkin(player, player.mm_save.r_skin)
@@ -81,6 +79,13 @@ addHook("PlayerSpawn", function(player)
 	end
 
 	player.mm.afkmodelast = player.mm_save.afkmode
+
+	local hook_event = MM.events["PlayerSpawn"]
+	for i,v in ipairs(hook_event)
+		MM.tryRunHook("PlayerSpawn", v,
+			player
+		)
+	end
 end)
 
 addScript "Waiting"

@@ -5,11 +5,8 @@ return function(p) -- Role handler
 	if p.mm.got_weapon then return end
 	
 	local gt = MM.returnGametype()
-	
 	local givenweapon = roles[p.mm.role].weapon
-
 	local hook_enabled = true
-	
 	local force_items = gt.items
 	if force_items then
 		local rn = P_RandomRange(1, #force_items)
@@ -23,10 +20,7 @@ return function(p) -- Role handler
 		end
 	end
 	
-
-	
 	local queuedweapons = {}
-	
 	if hook_enabled then
 		local hook_event = MM.events["GiveStartWeapon"]
 		for i,v in ipairs(hook_event)
@@ -53,12 +47,10 @@ return function(p) -- Role handler
 	end
 	
 	MM:GiveItem(p, givenweapon) -- Main item
-
 	if #queuedweapons then
 		for i,weapon_id in ipairs(queuedweapons) do
 			MM:GiveItem(p, weapon_id)
 		end
 	end
-	
 	p.mm.got_weapon = true
 end

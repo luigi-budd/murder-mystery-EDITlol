@@ -84,7 +84,7 @@ end
 
 local function delete3d(door)
 	if not door.made3d
-		door.flags2 = $ &~MF2_DONTDRAW
+		door.alpha = FU
 		return
 	end
 	
@@ -97,7 +97,7 @@ local function delete3d(door)
 	end
 	
 	door.made3d = false
-	door.flags2 = $ &~MF2_DONTDRAW
+	door.alpha = FU
 end
 
 local function DropTripmine(p)
@@ -116,11 +116,12 @@ end
 local TAKIS_3D_FLAGS = MF_NOGRAVITY|MF_NOCLIPHEIGHT|MF_NOCLIP|MF_SCENERY
 local function ThreeDThinker(door, me)
 	local trans = 0
-
+	local sproff = FixedMul(door.spriteyoffset, door.scale)
+	
 	if not door.made3d
 		local list
 		local flip = P_MobjFlip(door)
-		door.flags2 = $|MF2_DONTDRAW
+		door.alpha = 0
 		
 		door.sides = {}
 		list = door.sides
@@ -145,7 +146,7 @@ local function ThreeDThinker(door, me)
 			P_SetOrigin(list[0+i],
 				list[0+i].x,
 				list[0+i].y,
-				GetActorZ(door,list[0+i],1)
+				GetActorZ(door,list[0+i],1) + sproff
 			)
 		end
 		
@@ -159,10 +160,11 @@ local function ThreeDThinker(door, me)
 		list[7].scale = door.scale
 		list[7].destscale = door.destscale
 		list[7].scalespeed = door.scalespeed
-		P_SetOrigin(list[7],list[7].x,list[7].y,GetActorZ(door,list[7],1))
+		list[7].radius = 16 * door.scale
+		list[7].shadowscale = FU
+		P_SetOrigin(list[7],list[7].x,list[7].y,GetActorZ(door,list[7],1) + sproff)
 		
 		door.made3d = true
-	
 	--update positions
 	else
 		local list = door.sides
@@ -175,25 +177,24 @@ local function ThreeDThinker(door, me)
 			list[0+i].destscale = door.scale
 			list[0+i].scalespeed = list[0+i].destscale + 1
 			list[0+i].frame = ($ &~FF_TRANSMASK)|trans
+			list[0+i].flags2 = ($ &~MF2_DONTDRAW)|(door.flags2 & MF2_DONTDRAW)
 			P_MoveOrigin(list[0+i],
 				door.x+P_ReturnThrustX(nil,angle,16*door.scale) + me.momx,
 				door.y+P_ReturnThrustY(nil,angle,16*door.scale) + me.momy,
-				GetActorZ(door,list[0+i],1) + me.momz
+				GetActorZ(door,list[0+i],1) + me.momz + sproff
 			)
-			
 		end
 		
 		list[7].angle = door.angle
 		list[7].scale = door.scale
 		list[7].frame = ($ &~FF_TRANSMASK)|trans
+		list[7].flags2 = ($ &~MF2_DONTDRAW)|(door.flags2 & MF2_DONTDRAW)
 		P_MoveOrigin(list[7],
 			door.x + me.momx,
 			door.y + me.momy,
-			(P_MobjFlip(door) == 1 and door.z or door.z + door.height) + me.momz
+			door.z + me.momz + sproff
 		)
-		
 	end
-	
 end
 
 weapon.hiddenthinker = function(item,p)
@@ -261,5 +262,14 @@ weapon.drop = function(item,p)
 		P_RemoveMobj(item.ghost)
 	end
 end
+
+MM.addHook("DropItemThinker", function(item, mobj)
+	if item.id ~= "tripmine" then return end
+	
+	ThreeDThinker(mobj, mobj)
+end)
+-- bruh
+addHook("MobjDeath",delete3d,MT_THOK)
+addHook("MobjRemoved",delete3d,MT_THOK)
 
 return weapon

@@ -8,7 +8,7 @@ local playedsound = false
 
 local teamversus_mode = MM.RegisterGametype("Team Versus", {
 	tol = TOL_SAXAMM|TOL_MATCH;
-	max_time = 2*60*TICRATE;
+	max_time = 3*60*TICRATE;
 	required_players = 8;
 	inventory_count = 2;
 	fill_teams = true;
@@ -27,21 +27,26 @@ local teamversus_mode = MM.RegisterGametype("Team Versus", {
 	allow_corpses = true;
 	force_small_role_hud = true;
 	items = {"revolver", "shotgun", "sword", "knife", "hyperlaser"};
+	rare_items = {"tripmine", "beartrap", "balloon", "luger"};
 	thinker = function()
 		if (MM_N.time <= 0 or MM_N.showdown)
 		and MM_N.allow_respawn then
 			MM_N.allow_respawn = false
-			--chatprint("\x82\*Respawning disabled!")
 			S_StartSound(nil, sfx_s3k9c)
 			respawn_anim = RESPAWNTIME
 		end
 	end;
 	canGameEnd = function()
+		if (MM_N.tvs_mscore == nil or MM_N.tvs_sscore == nil)
+			return
+		end
+		
 		if (MM_N.tvs_mscore >= SCOREGOAL)
 		or (MM_N.tvs_sscore >= SCOREGOAL)
-		and not playedsound
-			S_StartSound(nil,sfx_lvpass)
-			S_StartSound(nil,sfx_nxbump)
+			if not playedsound
+				S_StartSound(nil,sfx_lvpass)
+				S_StartSound(nil,sfx_nxbump)
+			end
 			playedsound = true
 		end
 		if (MM_N.tvs_mscore >= SCOREGOAL)
@@ -76,6 +81,16 @@ end
 
 local temp_ms = 0
 local temp_ss = 0
+local function intlerp(frac,from,to)
+	if abs(to - from) <= frac then return to; end
+	if ((to - from)/frac == 0) and (to ~= from)
+		return to
+	end
+	return from + (to - from)/frac
+end
+local function lerp(frac,from,to)
+	return from + FixedDiv(to - from, frac)
+end
 
 -- Show how many we're fighting against on round start
 MM.addHook("RoundStart", do
@@ -112,6 +127,45 @@ MM.addHook("KilledPlayer", function(attacking_p, player)
 	
 	if not MM_N.allow_respawn
 		ShowStandings()
+	end
+end)
+
+MM.addHook("PlayerDies", function(player)
+	local gt = MM.returnGametype()
+	if gt.name ~= "Team Versus" then return end
+	
+	for k,v in pairs(player.mm.inventory.items) do
+		local mobj = MM:DropItem(player, k, false, true, true)
+		if mobj and mobj.valid
+			mobj.fuse = 5 * TR
+		end
+	end
+end)
+
+MM.addHook("PlayerSpawn", function(p)
+	local gt = MM.returnGametype()
+	if gt.name ~= "Team Versus" then return end
+	local mm = p.mm
+	
+	-- 30% chance to get something else
+	if P_RandomChance(FU*3/10)
+		local item = gt.rare_items[P_RandomRange(1, #gt.rare_items)]
+		MM:GiveItem(p, item, 2)
+	end
+	
+	-- Only run this when we respawn
+	if not mm.got_weapon then return end
+	
+	local item = gt.items[P_RandomRange(1, #gt.items)]
+	MM:GiveItem(p, item)
+end)
+
+MM.addHook("DropItemThinker", function(item, mobj)
+	local gt = MM.returnGametype()
+	if gt.name ~= "Team Versus" then return end
+	
+	if mobj.fuse < 0
+		mobj.fuse = 10 * TR
 	end
 end)
 
@@ -179,15 +233,24 @@ MMHUD.addHud("TVS_GeneralHUD", false,false, function(v,p,c)
 		local scale = FU/2
 		local pat, frac
 		local stroff = 0
+		
+		temp_ms = lerp(4*FU, (MM_N.tvs_mscore or 0)*FU, $)
+		temp_ss = lerp(4*FU, (MM_N.tvs_sscore or 0)*FU, $)
+		
 		if not MM_N.gameover
 			y = $ - MMHUD.xoffset
 		else
 			if MM_N.voting then return end
 			local animfrac = FU
 			local murdwin
-			if not (MM_N.tvs_mscore >= SCOREGOAL)
-			or (MM_N.tvs_sscore >= SCOREGOAL)
+			if not (MM_N.tvs_mscore >= SCOREGOAL
+			or MM_N.tvs_sscore >= SCOREGOAL)
 				murdwin = MM_N.endType == 2
+				if not murdwin
+					temp_ms = 0
+				else
+					temp_ss = 0
+				end
 			else
 				murdwin = (MM_N.tvs_mscore >= SCOREGOAL)
 			end
@@ -208,15 +271,15 @@ MMHUD.addHud("TVS_GeneralHUD", false,false, function(v,p,c)
 		
 		-- murderers
 		pat = v.cachePatch("MM_TVS_MFILL")
-		frac = FixedDiv(MM_N.tvs_mscore or "0", SCOREGOAL)
+		frac = FixedDiv(min(temp_ms,SCOREGOAL*FU), SCOREGOAL*FU)
 		v.drawCropped(x,y, scale,scale, pat,flags,nil, 0,0, FixedMul(pat.width*FU, frac),pat.height*FU)
-		v.drawString(x - width, y + stroff, MM_N.tvs_mscore or 0, flags, "thin-fixed-center", true)
+		v.drawString(x - width, y + stroff, temp_ms/FU, flags, "thin-fixed-center", true)
 		
 		-- sheriffs
 		pat = v.cachePatch("MM_TVS_SFILL")
-		frac = FixedDiv(MM_N.tvs_sscore or "0", SCOREGOAL)
+		frac = FixedDiv(min(temp_ss,SCOREGOAL*FU), SCOREGOAL*FU)
 		v.drawCropped(x+FixedMul(pat.width*scale, FU - frac),y, scale,scale, pat,flags,nil, FixedMul(pat.width*FU, max(FU - frac, 0)),0, pat.width*FU,pat.height*FU)
-		v.drawString(x + width, y + stroff, MM_N.tvs_sscore or 0, flags, "thin-fixed-center", true)
+		v.drawString(x + width, y + stroff, temp_ss/FU, flags, "thin-fixed-center", true)
 	end
 	
 	if (MM_N.gameover)

@@ -74,7 +74,9 @@ MM.sortInteracts = function(p,a,b)
 	
 	local aDist = R_PointToDist2(p.mo.x,p.mo.y, a.mo.x,a.mo.y)
 	local bDist = R_PointToDist2(p.mo.x,p.mo.y, b.mo.x,b.mo.y)
-	
+	if aDist == bDist
+		return false
+	end
 	if bDist <= aDist then
 		return false
 	end

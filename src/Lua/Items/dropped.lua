@@ -200,7 +200,18 @@ local function manage_unpicked_weapon(mobj, releaseTic)
 
 	mobj.flags = $ &~(MF_NOCLIP|MF_NOCLIPHEIGHT)
 	mobj.flags2 = $ &~MF2_DONTDRAW
-
+	if (mobj.fuse > 0)
+		if mobj.fuse <= TICRATE
+			if (mobj.fuse % 2)
+				mobj.flags2 = $|MF2_DONTDRAW
+			end
+		elseif mobj.fuse <= 3*TICRATE
+			if ((mobj.fuse/2) % 2)
+				mobj.flags2 = $|MF2_DONTDRAW
+			end
+		end
+	end
+	
 	mobj.spriteyoffset = z
 	mobj.angle = angle
 	mobj.flags = 0

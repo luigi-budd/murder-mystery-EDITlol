@@ -185,6 +185,10 @@ addHook("MobjDeath", function(target, inflictor, source, dmgt)
 				MM.tryRunHook("KilledPlayer", v, attacker, target_player)
 			end
 		end
+		local hook_event = MM.events["PlayerDies"]
+		for i,v in ipairs(hook_event)
+			MM.tryRunHook("PlayerDies", v, target_player, inflictor, source)
+		end
 	end
 	
 	if not MM:canGameEnd()

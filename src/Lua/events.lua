@@ -22,7 +22,10 @@
 	--[Player]--
 		* "PlayerInit", function(player_t, boolean midgame?)
 			Executes when a player spawns in and all MM variables are initialized.
-			If "midgame?" true, then the player joined midgame as a spectator 
+			If "midgame?" true, then the player joined midgame as a spectator
+		
+		* "PlayerSpawn", function(player_t)
+			Executes when a player spawns, same as the regular PlayerSpawn hook.
 			
 		* "PlayerThink", function(player_t player)
 			Executes when an alive player thinks during a round
@@ -123,6 +126,7 @@ events["PostMapLoad"] = {}
 events["Init"] = {}
 events["RoundStart"] = {}
 events["PlayerInit"] = {}
+events["PlayerSpawn"] = {}
 events["PlayerThink"] = {}
 events["DeadPlayerThink"] = {}
 events["SkidStart"] = {}
@@ -145,6 +149,7 @@ events["CreateAlias"] = {}
 events["ApplyAlias"] = {}
 events["OnRawChat"] = {}
 events["KilledPlayer"] = {handler = handler_snapany} -- TODO: Documentation
+events["PlayerDies"] = {handler = handler_snapany} -- TODO: Documentation
 MM.events = events
 
 MM.addHook = function(hooktype, func)
