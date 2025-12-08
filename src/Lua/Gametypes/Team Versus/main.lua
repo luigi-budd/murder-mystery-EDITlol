@@ -147,6 +147,16 @@ MM.addHook("PlayerSpawn", function(p)
 	if gt.name ~= "Team Versus" then return end
 	local mm = p.mm
 	
+	--um, that aint right
+	if mm.role == MMROLE_INNOCENT
+		local count = MM.countPlayers()
+		if count.murderers > count.regulars
+			mm.role = MMROLE_SHERIFF
+		else
+			mm.role = MMROLE_MURDERERS
+		end
+	end
+	
 	-- 30% chance to get something else
 	if P_RandomChance(FU*3/10)
 		local item = gt.rare_items[P_RandomRange(1, #gt.rare_items)]
