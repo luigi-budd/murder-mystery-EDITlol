@@ -48,7 +48,7 @@ return function()
 		end
 		
 		if MM:pregame()
-			MM_N.dueling = numplay == 2 or (CV_MM.force_duel.value ~= 0)
+			MM_N.dueling = ((numplay == 2) and not MM.Gametypes[MM_N.gametype].disable_duels) or (CV_MM.force_duel.value ~= 0)
 			MM_N.duel_item = possibleItems[P_RandomRange(1,#possibleItems)]
 		end
 		

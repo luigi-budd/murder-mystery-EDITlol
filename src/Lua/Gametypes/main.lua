@@ -3,10 +3,12 @@ MM.Gametypes = {}
 local DEFAULT_MAX_TIME = 3*60*TICRATE
 
 -- TODO: default variables should go here
--- TODO: gamemodes should have a dueling toggle
 local gametype_t = {
 	tol = TOL_SAXAMM,
-	max_time = DEFAULT_MAX_TIME
+	max_time = DEFAULT_MAX_TIME,
+	
+	disable_duels = false,
+	
 }
 registerMetatable(gametype_t)
 

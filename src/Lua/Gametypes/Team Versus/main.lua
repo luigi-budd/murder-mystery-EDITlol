@@ -19,6 +19,7 @@ local teamversus_mode = MM.RegisterGametype("Team Versus", {
 	disable_killgoal = true;
 	disable_showdown = true;
 	disable_gun_countdown = true;
+	disable_duels = true;
 	force_overtime = true;
 	reveal_roles = true;
 	all_droppable_items = true;
