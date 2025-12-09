@@ -33,6 +33,31 @@ local function HUD_GoalDrawer(v,p)
 		end
 	end
 	
+	local gt = MM.returnGametype()
+	if gt.hudgoals ~= nil
+		/*
+		-- this functions returns a table filled with tables formatted
+		-- like the previous ones
+		-- example:
+
+			return {
+				{string = "Example", flags = 0},
+				{string = "Test", flags = V_ORANGEMAP},
+			}
+		*/
+		local newgoals = gt.hudgoals(p, flags)
+		if type(newgoals) ~= "table"
+			error("gametype.hudgoals() must return a table")
+		end
+		for k, goalpair in ipairs(newgoals)
+			if goalpair.string == nil
+				continue
+			end
+			goalpair.flags = $ or flags
+			table.insert(goals, goalpair)
+		end
+	end
+
 	do
 		local longest_str = max(55, MMHUD.info_xpos or 0)
 		local goal_len = 0

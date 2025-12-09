@@ -25,6 +25,12 @@ local function HUD_InteractDrawer(v,p,cam)
 		return not MM.sortInteracts(p,a,b)
 	end)
 	
+	-- these can be used a ton in a tic, so keep em all up here
+	local longeststr = v.stringWidth("Howlongcan",0,"thin")
+	local icon = v.cachePatch("MM_INTERBOX")
+	local resolution = 55
+	local radi = 12
+	
 	for k,inter in ipairs(placehold_inter)
 		local mo = inter.mo
 		if not (mo and mo.valid) then mo = inter.backup end
@@ -32,7 +38,6 @@ local function HUD_InteractDrawer(v,p,cam)
 		
 		local trans = (k ~= #placehold_inter and V_50TRANS or 0)
 		do
-			local icon = v.cachePatch("MM_INTERBOX")
 			local w2s = sglib.ObjectTracking(v,p,cam,mo)
 			
 			local goingaway = inter.hud.goingaway and inter.timesinteracted
@@ -42,7 +47,6 @@ local function HUD_InteractDrawer(v,p,cam)
 			)
 			
 			local scalef = inter.hud.xscale
-			local longeststr = v.stringWidth("Howlongcan",0,"thin")
 			local longest = max(
 				v.stringWidth(inter.name or '',0,"thin"),
 				v.stringWidth(inter.interacttext or '',0,"thin")
@@ -55,7 +59,7 @@ local function HUD_InteractDrawer(v,p,cam)
 			
 			local x = w2s.x - (FixedMul(icon.width*FU,scalef)/2)
 			local y = w2s.y
-			MMHUD.interpolate(v,k)
+			MMHUD.interpolate(v,mo.dropid or k)
 			do	--draw
 				if scalef > 0
 					v.drawStretched(x, y,
@@ -82,7 +86,7 @@ local function HUD_InteractDrawer(v,p,cam)
 					if inter.price ~= 0
 						local origin_size = FixedDiv(16*FU, v.cachePatch("MMRING").width*FU) -- Scale to 16 pixels
 						local origin_scale = FU/2
-					
+						
 						v.drawScaled(x + 30*FU,
 							y + 22*FU,
 							FixedMul(origin_size, origin_scale),
@@ -93,6 +97,14 @@ local function HUD_InteractDrawer(v,p,cam)
 							y + 23*FU,
 							inter.price,
 							V_ALLOWLOWERCASE|V_YELLOWMAP|trans,
+							"thin-fixed"
+						)
+					-- dropped item
+					elseif (mo.ammo and mo.max_ammo) and mo.pickupid ~= nil
+						v.drawString(x + 30*FU,
+							y + 23*FU,
+							(mo.ammo).."/"..(mo.max_ammo),
+							V_ALLOWLOWERCASE,
 							"thin-fixed"
 						)
 					end
@@ -118,9 +130,7 @@ local function HUD_InteractDrawer(v,p,cam)
 					"thin-fixed-center"
 				)
 				
-				local resolution = 55
 				local timetic = FixedDiv(inter.interacting*FU,inter.interacttime*FU)
-				local radi = 12
 				if timetic ~= 0
 					for i = 0,resolution
 						local angle = FixedAngle(
@@ -147,6 +157,5 @@ local function HUD_InteractDrawer(v,p,cam)
 		
 	end
 	MMHUD.interpolate(v,false)
-	
 end
 return HUD_InteractDrawer

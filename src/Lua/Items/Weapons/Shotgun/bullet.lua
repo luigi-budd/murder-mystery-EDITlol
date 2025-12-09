@@ -6,6 +6,7 @@ mobjinfo[freeslot "MT_MM_BULLET"] = {
 	deathstate = S_SMOKE1,
 	speed = 32*FU
 }
+mobjinfo[MT_MM_BULLET].sparkvfx_spokes = 2
 
 addHook("MobjThinker", function(mo)
 	if not mo.valid then return end

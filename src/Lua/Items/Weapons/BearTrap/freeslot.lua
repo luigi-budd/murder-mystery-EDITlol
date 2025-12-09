@@ -65,6 +65,20 @@ MM:RegisterEffect("perk.beartrap.slow", {
 	},
 })
 
+local function playersonteam(mine, source, player)
+	--if (source == player) then return true
+	if player.mm.role == MMROLE_INNOCENT
+		return false
+	end
+	if not (source and source.valid)
+		return mine.mmteam == player.mm.role
+	end
+	if source.mm.role == MMROLE_INNOCENT
+		return false
+	end
+	return source.mm.role == player.mm.role
+end
+
 addHook("MobjThinker",function(trap)
 	if not (trap and trap.valid) then return end
 	if P_IsObjectOnGround(trap)
@@ -131,17 +145,12 @@ addHook("TouchSpecial",function(mine,me)
 	local p = me.player
 	
 	--dont kill our teammates lol
-	local isTeamMate = (p.mm.role == MMROLE_MURDERER
-	and mine.tracer_player.mm.role == MMROLE_MURDERER)
-	and (me ~= mine.tracer)
-	
-	/*
-	if isTeamMate or (me == mine.tracer) then
+	local isTeamMate = playersonteam(mine, mine.tracer_player, p) and (me ~= mine.tracer)
+	if isTeamMate then
 		mine.health = mine.info.spawnhealth
 		mine.flags = $|MF_SPECIAL
 		return true
 	end
-	*/
 	
 	local sfx = P_SpawnGhostMobj(mine)
 	sfx.flags2 = $|MF2_DONTDRAW
@@ -199,7 +208,7 @@ addHook("TouchSpecial",function(mine,me)
 		if (mine.tracer_player)
 			if mine.tracer_player == player
 				showme = true
-			elseif player.mm.role == mine.tracer_player.mm.role
+			elseif player.mm.role == mine.mmteam
 				showme = true
 			end
 		end

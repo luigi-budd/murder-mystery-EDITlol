@@ -38,7 +38,7 @@ local SECRECY_MURDERERALLOWED = 1
 local SECRECY_SHERIFFALLOWED = -1
 local SECRECY_SECRET = 2
 
-local roles = MM.require "Variables/Data/Roles"
+local roles = MM.require("Variables/Data/Roles")
 
 local ROLESTYLES = {
 	Unknown = {

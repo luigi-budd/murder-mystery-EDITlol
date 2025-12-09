@@ -53,6 +53,7 @@ local function DropBearTrap(p)
 	mine.scale = me.scale
 	mine.tracer = me
 	mine.tracer_player = p
+	mine.mmteam = p.mm.role
 end
 
 MM.addHook("KeepingItem", function(p, def, item)
@@ -130,10 +131,19 @@ weapon.unequip = function(item,p)
 		P_RemoveMobj(item.ghost)
 	end
 end
-weapon.drop = function(item,p)
+weapon.drop = function(item,p, mobj)
 	if (item.ghost and item.ghost.valid)
 		P_RemoveMobj(item.ghost)
 	end
+	
+	mobj.ammo = item.ammoleft
+	mobj.max_ammo = weapon.maxshots
+end
+weapon.postpickup = function(item,p,mobj)
+	item.ammoleft = mobj.ammo
+	
+	item.ammo = nil
+	item.max_ammo = 0
 end
 
 weapon.drawer = function(v, p,item, x,y,scale,flags, selected, active)

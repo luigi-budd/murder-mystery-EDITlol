@@ -73,6 +73,9 @@ local function SpawnExplosions(mine, doquake, docount, colorized)
 	
 	local count = docount
     if count == nil then count = 25 end
+	if MM.Gametypes[MM_N.gametype].tamer_tripmine
+		count = 10
+	end
 
 	local anglecount = FixedDiv(360*FU,count*FU)
 	for i = 0,count
@@ -168,6 +171,8 @@ mobjinfo[SafeFreeslot("MT_MM_TRIPMINE")] = {
 }
 
 local function ExplosionCompliment(mine)
+	if MM.Gametypes[MM_N.gametype].tamer_tripmine then return end
+	
 	local sfx = P_SpawnGhostMobj(mine)
 	sfx.fuse = 3 * TICRATE
 	sfx.tics = sfx.fuse
@@ -541,6 +546,8 @@ local function SpawnSparks(mo)
 end
 
 local function SetPurplePlanes(mo)
+	if MM.Gametypes[MM_N.gametype].tamer_tripmine then return end
+	
 	local fakerange = 256*mo.scale
 	searchBlockmap("lines", function(ref, line)
 		if line.frontside
@@ -622,7 +629,20 @@ local function SetPurplePlanes(mo)
 	mo,
 	mo.x-fakerange, mo.x+fakerange,
 	mo.y-fakerange, mo.y+fakerange)
-	
+end
+
+local function playersonteam(mine, source, player)
+	--if (source == player) then return true
+	if player.mm.role == MMROLE_INNOCENT
+		return false
+	end
+	if not (source and source.valid)
+		return mine.mmteam == player.mm.role
+	end
+	if source.mm.role == MMROLE_INNOCENT
+		return false
+	end
+	return source.mm.role == player.mm.role
 end
 
 addHook("TouchSpecial",function(mine,me)
@@ -633,8 +653,7 @@ addHook("TouchSpecial",function(mine,me)
 	local p = me.player
 	
 	--dont kill our teammates lol
-	if (p.mm.role == MMROLE_MURDERER
-	and mine.tracer and mine.tracer.player.mm.role == MMROLE_MURDERER)
+	if playersonteam(mine, mine.tracer_player, p)
 	and (me ~= mine.tracer)
 		mine.health = mine.info.spawnhealth
 		mine.flags = $|MF_SPECIAL|MF_SOLID
@@ -649,8 +668,10 @@ addHook("TouchSpecial",function(mine,me)
 	sfx.fuse = 12*TR
 	
 	S_StartSound(sfx,mine.info.deathsound)
-	S_StartSound(sfx,mine.info.deathsound)
-	S_StartSound(sfx,mine.info.deathsound)
+	if not MM.Gametypes[MM_N.gametype].tamer_tripmine
+		S_StartSound(sfx,mine.info.deathsound)
+		S_StartSound(sfx,mine.info.deathsound)
+	end
 	
 	if mine.aura and mine.aura.valid
 		P_RemoveMobj(mine.aura)
@@ -692,8 +713,10 @@ addHook("MobjDeath",function(mine,_,src,dmgt)
 	sfx.fuse = 12*TR
 	
 	S_StartSound(sfx,mine.info.deathsound)
-	S_StartSound(sfx,mine.info.deathsound)
-	S_StartSound(sfx,mine.info.deathsound)
+	if not MM.Gametypes[MM_N.gametype].tamer_tripmine
+		S_StartSound(sfx,mine.info.deathsound)
+		S_StartSound(sfx,mine.info.deathsound)
+	end
 	
 	if mine.aura and mine.aura.valid
 		P_RemoveMobj(mine.aura)
@@ -704,7 +727,10 @@ addHook("MobjDeath",function(mine,_,src,dmgt)
 	ExplosionCompliment(mine)
 	delete3d(mine)
 	
-	local killing_player = (src and src.valid and src.player and src.player.valid) and src
+	local killing_playermo = nil
+	if (src and src.valid and src.player and src.player.valid)
+		killing_playermo = src
+	end
 	local radius = 550*mine.scale
 	for p in players.iterate
 		if (p.spectator) then continue end
@@ -717,17 +743,19 @@ addHook("MobjDeath",function(mine,_,src,dmgt)
 		or abs(mine.z - me.z) > radius
 			continue
 		end
-
-		--credit the sheriff if they killed the murderer
+		if FixedHypot(FixedHypot(mine.x - me.x,mine.y - me.y),mine.z - me.z) > radius
+			continue
+		end
+		
 		local killer = mine.tracer
-		if (p.mm.role == MMROLE_MURDERER)
-		and (killing_player and killing_player.valid)
+		if (killing_playermo and killing_playermo.valid)
 			--Bro
-			if killing_player.player.mm.role == MMROLE_MURDERER
+			if playersonteam(mine, killing_playermo.player, p)
 				continue
 			end
 			
-			killer = killing_player
+			--credit the sheriff if they killed the murderer
+			killer = killing_playermo
 		end
 		
 		SpawnSparks(me)
@@ -744,6 +772,7 @@ addHook("MobjDeath",function(mine,_,src,dmgt)
 		S_StartSound(me,mine.info.deathsound)
 	end
 	
+	-- this sets off the tripmine chain reactions
 	searchBlockmap("objects", function(ref, me)
 		if mine == me then return end
 		if me.type ~= mine.type then return end
@@ -754,17 +783,20 @@ addHook("MobjDeath",function(mine,_,src,dmgt)
 		or abs(mine.z - me.z) > radius
 			return
 		end
+		if FixedHypot(FixedHypot(mine.x - me.x,mine.y - me.y),mine.z - me.z) > radius
+			return
+		end
 		
 		me.markedfordeath = HITLAG_DURATION
 		me.deathvar = {
 			_, src
 		}
 		S_StartSound(me, sfx_buzz3)
-	end, 
-	mine,
-	mine.x - radius, mine.x + radius,
-	mine.y - radius, mine.y + radius)
-
+	end,
+		mine,
+		mine.x - radius, mine.x + radius,
+		mine.y - radius, mine.y + radius
+	)
 end,MT_MM_TRIPMINE)
 
 addHook("MobjRemoved",delete3d,MT_MM_TRIPMINE)

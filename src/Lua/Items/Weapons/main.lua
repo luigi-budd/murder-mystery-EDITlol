@@ -39,7 +39,7 @@ MM.BulletDies = function(mo, moagainst, line)
 		angle = R_PointToAngle2(line.v1.x, line.v1.y, line.v2.x, line.v2.y)
 	end
 	
-	local spokes = 8
+	local spokes = mo.info.sparkvfx_spokes or 8
 	local fa = FixedDiv(360*FU, spokes*FU)
 	local speed = 6*mo.scale
 	

@@ -54,8 +54,49 @@ function weapon:postpickup(p)
 end
 
 --shotgun spread
+-- this just reuses code from paintguns brella system lol
 function weapon:attack(p)
 	self.shootmobj = MT_MM_BULLET
+	
+	local spread = 2*FU
+	local noise = FU/2
+	
+	/*
+		these both make the spread
+		pattern roughly look like
+		
+			  * * *
+			* * * * *
+			  * * *
+	*/
+	for i = -2,2
+		--if i == 0 then continue end
+		local frac = FixedDiv((i*FU), 2*FU)
+		local ang = FixedMul(spread,frac) - FixedMul(noise, P_RandomFixed())
+		local aim = FixedMul(noise, P_RandomFixed())
+		
+		MM.FireBullet(p, MM.Items[self.id], self,
+			p.mo.angle + FixedAngle(ang),
+			p.aiming + FixedAngle(aim),
+			false
+		)
+	end
+	for i = -1,1
+		for j = -1,1,2
+			local h_frac = FixedDiv((i*FU), 2*FU)
+			local v_frac = FixedDiv((j*FU), 2*FU)
+			local ang = FixedMul(spread,h_frac) - FixedMul(noise, P_RandomFixed())
+			local aim = FixedMul(spread,v_frac) + FixedMul(noise, P_RandomFixed())
+			
+			MM.FireBullet(p, MM.Items[self.id], self,
+				p.mo.angle + FixedAngle(ang),
+				p.aiming + FixedAngle(aim),
+				false
+			)
+		end
+	end
+	
+	/*
 	for i = -2,2
 		-- about 4 degrees of spread all around
 		MM.FireBullet(p, MM.Items[self.id], self,
@@ -69,6 +110,7 @@ function weapon:attack(p)
 		p.aiming,
 		false
 	)
+	*/
 	self.shootmobj = MT_RAY
 end
 

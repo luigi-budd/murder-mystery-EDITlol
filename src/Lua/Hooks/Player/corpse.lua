@@ -324,8 +324,8 @@ addHook("MobjDeath", function(target, inflictor, source, dmgt)
 		
 		target.flags2 = $|MF2_DONTDRAW
 		
-		if gt.instant_body_discover and target.player and target.player.valid then
-			chatprint("\x82*"..target.player.name.." has died!")
+		if (gt.instant_body_discover and target.player and target.player.valid) and not MM_N.allow_respawn then
+			chatprint("\x82*"..target.player.name.."\x82 has died!")
 			
 			MM_N.knownDeadPlayers[#target.player] = true
 		end

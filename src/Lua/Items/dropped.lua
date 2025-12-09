@@ -17,11 +17,12 @@ local Pickup_Interaction = MM.addInteraction(function(p,mobj)
 	local item = MM:GiveItem(p, mobj.pickupid)
 
 	if item then
+		item.ammo = mobj.ammo
 		if mobj.pickupsfx then
 			S_StartSound(p.mo, mobj.pickupsfx)
 		end
 		if def.postpickup then
-			def.postpickup(item, p)
+			def.postpickup(item, p, mobj)
 		end
 		
 		P_RemoveMobj(mobj)
@@ -61,8 +62,6 @@ function MM:SpawnItemDrop(item_id, x, y, z, angle, flip, extra)
 	
 	mobj.pickupwait = TICRATE
 	mobj.sourcep = p
-	
-	mobj.magtime = 0
 	
 	if extra then
 		if extra.price then
@@ -126,7 +125,17 @@ function MM:DropItem(p, slot, randomize, dont_notify, forced)
 	
 	local mobj
 	if item.allowdropmobj
-		mobj = P_SpawnMobjFromMobj(p.mo, 0,0,FixedMul(p.mo.height/2, p.mo.scale), MT_THOK)
+		-- dont spawn multiple items in the same place
+		local thrustang = FixedAngle(P_RandomRange(0,360))*FU
+		local thrustdist = P_RandomRange(1,5) * FU
+		mobj = P_SpawnMobjFromMobj(p.mo,
+			P_ReturnThrustX(nil, thrustang, thrustdist),
+			P_ReturnThrustY(nil, thrustang, thrustdist),
+			FixedDiv(p.mo.height/2, p.mo.scale), MT_THOK
+		)
+		if not P_CheckPosition(mobj, mobj.x,mobj.y,mobj.z)
+			P_SetOrigin(mobj, p.mo.x, p.mo.y, p.mo.z + p.mo.height/2)
+		end
 		mobj.state = item.state
 		mobj.tics = -1
 		mobj.fuse = -1
@@ -147,7 +156,8 @@ function MM:DropItem(p, slot, randomize, dont_notify, forced)
 		mobj.pickupwait = TICRATE
 		mobj.sourcep = p
 		
-		mobj.magtime = 0
+		mobj.ammo = item.ammo
+		mobj.max_ammo = item.max_ammo
 		
 		mobj.flags = 0
 		mobj.dropid = #MM.DroppedMobjs + 1
@@ -220,9 +230,11 @@ local function manage_unpicked_weapon(mobj, releaseTic)
 	if (displayplayer and displayplayer.valid)
 		local p = displayplayer
 		if (p == mobj.sourcep and mobj.pickupwait > 0)
-			mobj.frame = $|FF_TRANS50
+			mobj.translation = "Grayscale"
+			mobj.alpha = FU * 3/4
 		else
-			mobj.frame = $ &~FF_TRANSMASK
+			mobj.translation = nil
+			mobj.alpha = FU
 		end
 	end
 	
@@ -257,21 +269,6 @@ local function manage_unpicked_weapon(mobj, releaseTic)
 		--You have to wait to pick this up again
 		if (p == mobj.sourcep and mobj.pickupwait > 0) then continue end
 		
-		/*
-		if not (p.cmd.buttons & BT_CUSTOM3
-		and not (p.lastbuttons & BT_CUSTOM3)) then
-			continue
-		end
-		
-		local radius = p.mo.radius*4
-
-		if abs(p.mo.x - mobj.x) > radius
-		or abs(p.mo.y - mobj.y) > radius
-		or abs(p.mo.z - mobj.z) > p.mo.height then
-			continue
-		end
-		*/
-
 		MM.interactPoint(p,mobj, {
 			name = def.display_name or "Item",
 			intertext = "Pick up",

@@ -8,7 +8,7 @@ local playedsound = false
 
 local teamversus_mode = MM.RegisterGametype("Team Versus", {
 	tol = TOL_SAXAMM|TOL_MATCH;
-	max_time = 3*60*TICRATE;
+	max_time = (2*60*TICRATE) + (30 * TICRATE);
 	required_players = 8;
 	inventory_count = 2;
 	fill_teams = true;
@@ -55,6 +55,12 @@ local teamversus_mode = MM.RegisterGametype("Team Versus", {
 			return true, 1
 		end
 	end;
+	hudgoals = function(p, flags)
+		return {
+			{string = "Kills   : "..(p.mtvs_score or 0)/POINTINC, flags = flags},
+			{string = "Deaths : "..(p.mtvs_deaths or 0), flags = flags},
+		}
+	end;
 })
 
 local dohitmarker = 0
@@ -81,15 +87,11 @@ end
 
 local temp_ms = 0
 local temp_ss = 0
-local function intlerp(frac,from,to)
-	if abs(to - from) <= frac then return to; end
-	if ((to - from)/frac == 0) and (to ~= from)
+local function lerp(frac,to,from)
+	if FixedMul(to - from, frac) <= frac
 		return to
 	end
-	return from + (to - from)/frac
-end
-local function lerp(frac,from,to)
-	return from + FixedDiv(to - from, frac)
+	return from + FixedMul(to - from, frac)
 end
 
 -- Show how many we're fighting against on round start
@@ -107,7 +109,7 @@ end)
 MM.addHook("KilledPlayer", function(attacking_p, player)
 	local gt = MM.returnGametype()
 	if gt.name ~= "Team Versus" then return end
-	--if MM_N.time > 90*TICRATE then return end
+	if (attacking_p == player) then return end -- you fucked up
 	
 	if (consoleplayer and consoleplayer.valid)
 	and (attacking_p and attacking_p.valid)
@@ -124,6 +126,7 @@ MM.addHook("KilledPlayer", function(attacking_p, player)
 		-- Point murderers
 		MM_N.tvs_mscore = $ + POINTINC
 	end
+	attacking_p.mtvs_score = $ + POINTINC
 	
 	if not MM_N.allow_respawn
 		ShowStandings()
@@ -140,11 +143,23 @@ MM.addHook("PlayerDies", function(player)
 			mobj.fuse = 5 * TR
 		end
 	end
+	
+	player.mtvs_deaths = $ + 1
 end)
 
 MM.addHook("PlayerSpawn", function(p)
 	local gt = MM.returnGametype()
-	if gt.name ~= "Team Versus" then return end
+	if gt.name ~= "Team Versus"
+		p.mtvs_score = nil
+		p.mtvs_deaths = nil
+		return
+	end
+	if p.mtvs_score == nil
+		p.mtvs_score = 0
+	end
+	if p.mtvs_deaths == nil
+		p.mtvs_deaths = 0
+	end
 	local mm = p.mm
 	
 	--um, that aint right
@@ -153,7 +168,7 @@ MM.addHook("PlayerSpawn", function(p)
 		if count.murderers > count.regulars
 			mm.role = MMROLE_SHERIFF
 		else
-			mm.role = MMROLE_MURDERERS
+			mm.role = MMROLE_MURDERER
 		end
 	end
 	
@@ -198,6 +213,22 @@ MMHUD.addHud("TVS_Hitmarker", false,false, function(v,p,c)
 	dohitmarker = $ - 1
 end, "game")
 
+local lerp_frac = FU/4
+local indanger = 0 --: -1 = team, 1 = enemies
+local dangereffects = {}
+local function adddangereffect(v, x,y, height, sign, clr)
+	local desty = y + FixedMul(height, v.RandomFixed())
+	
+	table.insert(dangereffects, {
+		x = x + v.RandomRange(-2,2)*FU,
+		y = desty,
+		tics = v.RandomRange(4, 12),
+		mom = v.RandomRange(2,6)*FU * sign,
+		flip = sign == 1,
+		clr = clr
+	})
+end
+
 MMHUD.addHud("TVS_GeneralHUD", false,false, function(v,p,c)
 	local gt = MM.returnGametype()
 	if gt.name ~= "Team Versus" then return end
@@ -241,14 +272,25 @@ MMHUD.addHud("TVS_GeneralHUD", false,false, function(v,p,c)
 		local y = 5*FU
 		local flags = V_SNAPTOTOP
 		local scale = FU/2
-		local pat, frac
+		local pat, frac, score, pad, rwid
 		local stroff = 0
+		local flip = p.mm.role ~= MMROLE_MURDERER
+		local left,right = 0,0
+		local r_color,l_color = 0,0
 		
-		temp_ms = lerp(4*FU, (MM_N.tvs_mscore or 0)*FU, $)
-		temp_ss = lerp(4*FU, (MM_N.tvs_sscore or 0)*FU, $)
-		
+		indanger = 0
 		if not MM_N.gameover
 			y = $ - MMHUD.xoffset
+			temp_ms = lerp(lerp_frac, (MM_N.tvs_mscore or 0)*FU, $)
+			temp_ss = lerp(lerp_frac, (MM_N.tvs_sscore or 0)*FU, $)
+			
+			if max(temp_ms, temp_ss) >= (SCOREGOAL*FU) / 2
+			and temp_ms ~= temp_ss
+				indanger = (temp_ss > temp_ms) and -1 or 1
+				if (flip)
+					indanger = -$
+				end
+			end
 		else
 			if MM_N.voting then return end
 			local animfrac = FU
@@ -257,11 +299,15 @@ MMHUD.addHud("TVS_GeneralHUD", false,false, function(v,p,c)
 			or MM_N.tvs_sscore >= SCOREGOAL)
 				murdwin = MM_N.endType == 2
 				if not murdwin
-					temp_ms = 0
+					temp_ms = lerp(lerp_frac, 0, $)
+					temp_ss = lerp(lerp_frac, (MM_N.tvs_sscore or 0)*FU, $)
 				else
-					temp_ss = 0
+					temp_ms = lerp(lerp_frac, (MM_N.tvs_mscore or 0)*FU, $)
+					temp_ss = lerp(lerp_frac, 0, $)
 				end
 			else
+				temp_ms = lerp(lerp_frac, (MM_N.tvs_mscore or 0)*FU, $)
+				temp_ss = lerp(lerp_frac, (MM_N.tvs_sscore or 0)*FU, $)
 				murdwin = (MM_N.tvs_mscore >= SCOREGOAL)
 			end
 			
@@ -271,25 +317,62 @@ MMHUD.addHud("TVS_GeneralHUD", false,false, function(v,p,c)
 			
 			scale = ease.outquad(animfrac, $, FU * 4/5)
 			y = ease.outback(animfrac, $, 20*FU, FU)
-			stroff = 3 * (scale - (FU/2))
 			
 			v.drawString(x, y - 10*FU, (murdwin and "Murderers" or "Sheriffs").." Win!", flags|V_ALLOWLOWERCASE|(murdwin and V_REDMAP or V_BLUEMAP), "thin-fixed-center")
 		end
+		stroff = 3 * (scale - (FU/2))
+		pad = 53 * scale
+		rwid = 171 * scale
+		
 		local width = 140*scale
-		v.drawScaled(x,y, scale, v.cachePatch("MM_TVS_BG"), flags)
+		v.drawScaled(x,y, scale, v.cachePatch("MM_TVS_BG"), flags|(flip and V_FLIP or 0))
 		v.drawString(x,y + stroff, SCOREGOAL, V_YELLOWMAP|flags, "thin-fixed-center", true)
 		
-		-- murderers
-		pat = v.cachePatch("MM_TVS_MFILL")
-		frac = FixedDiv(min(temp_ms,SCOREGOAL*FU), SCOREGOAL*FU)
+		-- murderers / teammates
+		score = temp_ms
+		if (flip) then score = temp_ss; end
+		pat = v.cachePatch(flip and "MM_TVS_MFILL_F" or "MM_TVS_MFILL")
+		frac = FixedDiv(min(score,SCOREGOAL*FU), SCOREGOAL*FU)
 		v.drawCropped(x,y, scale,scale, pat,flags,nil, 0,0, FixedMul(pat.width*FU, frac),pat.height*FU)
-		v.drawString(x - width, y + stroff, temp_ms/FU, flags, "thin-fixed-center", true)
+		v.drawString(x - width, y + stroff, score/FU, flags, "thin-fixed-center", true)
+		left = (x - rwid + pad) + FixedMul(pat.width*scale, frac)
+		l_color = (flip) and SKINCOLOR_BLUE or SKINCOLOR_RED
 		
-		-- sheriffs
-		pat = v.cachePatch("MM_TVS_SFILL")
-		frac = FixedDiv(min(temp_ss,SCOREGOAL*FU), SCOREGOAL*FU)
+		-- sheriffs / enemies
+		score = temp_ss
+		if (flip) then score = temp_ms; end
+		pat = v.cachePatch(flip and "MM_TVS_SFILL_F" or "MM_TVS_SFILL")
+		frac = FixedDiv(min(score,SCOREGOAL*FU), SCOREGOAL*FU)
 		v.drawCropped(x+FixedMul(pat.width*scale, FU - frac),y, scale,scale, pat,flags,nil, FixedMul(pat.width*FU, max(FU - frac, 0)),0, pat.width*FU,pat.height*FU)
-		v.drawString(x + width, y + stroff, temp_ss/FU, flags, "thin-fixed-center", true)
+		v.drawString(x + width, y + stroff, score/FU, flags, "thin-fixed-center", true)
+		right = (x + rwid - pad) - FixedMul(pat.width*scale, frac)
+		r_color = (flip) and SKINCOLOR_RED or SKINCOLOR_BLUE
+		
+		if indanger ~= 0
+			local xpos = right
+			local clr = r_color
+			if (indanger == 1)
+				xpos = left
+				clr = l_color
+			end
+			adddangereffect(v, xpos, y, 18*scale, -indanger, clr)
+		end
+		
+		for k,va in ipairs(dangereffects)
+			if va.tics <= 0
+				table.remove(dangereffects, k)
+			end
+		end
+		for k,va in ipairs(dangereffects)
+			local alpha = 0
+			if va.tics < 5
+				alpha = (10 - (va.tics*2))<<V_ALPHASHIFT
+			end
+			v.drawScaled(va.x,va.y, scale, v.cachePatch("MM_TVS_SCOREFX"), flags|(va.flip and V_FLIP or 0)|V_ADD|alpha, v.getColormap(TC_DEFAULT, va.clr))
+			va.x = $ + va.mom
+			va.mom = $ * 9/10
+			va.tics = $ - 1
+		end
 	end
 	
 	if (MM_N.gameover)
@@ -322,7 +405,7 @@ MMHUD.addHud("TVS_GeneralHUD", false,false, function(v,p,c)
 	if not (msgstatus.tics) then return end
 	
 	local x = 160*FU
-	local y = 30*FU
+	local y = 35*FU
 	local str = msgstatus.str
 	
 	local flags = V_SNAPTOTOP

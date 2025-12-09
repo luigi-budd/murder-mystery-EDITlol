@@ -128,7 +128,7 @@ local function V_DrawBox(props)
 	
 	local def = MM.Items[item.id]
 	
-	if (item.max_ammo ~= 0)
+	if (item.max_ammo ~= 0 and item.ammo ~= nil and item.max_ammo ~= nil)
 	and (not item.noammoinduels and not MM_N.dueling)
 		if not selected
 			v.slideDrawString(x, (y + 32*scale) - 8*FU,

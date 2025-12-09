@@ -300,6 +300,7 @@ function MM:CopyItemFromID(item_id)
 end
 
 function MM:MakeWeaponMobj(p, item)
+	if not (p.mo.valid) then return end -- nice one
 	local def = self.Items[item.id]
 	local mobj = P_SpawnMobjFromMobj(p.mo, 0,0,0, MT_THOK)
 
