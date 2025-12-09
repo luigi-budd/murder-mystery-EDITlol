@@ -26,6 +26,7 @@ local teamversus_mode = MM.RegisterGametype("Team Versus", {
 	instant_body_discover = true;
 	allow_respawn = true;
 	allow_corpses = true;
+	allow_iframes = true;
 	force_small_role_hud = true;
 	items = {"revolver", "shotgun", "sword", "knife", "hyperlaser"};
 	rare_items = {"tripmine", "beartrap", "balloon", "luger"};

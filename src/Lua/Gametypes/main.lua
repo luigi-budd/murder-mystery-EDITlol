@@ -8,7 +8,7 @@ local gametype_t = {
 	max_time = DEFAULT_MAX_TIME,
 	
 	disable_duels = false,
-	
+	allow_iframes = false, -- if true, players cannot be damaged with iframes
 }
 registerMetatable(gametype_t)
 

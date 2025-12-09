@@ -282,6 +282,11 @@ MM.BulletHit = function(ring,pmo)
 	
 	if not (pmo.player and pmo.player.mm) then return end
 
+	local use_iframes = MM.Gametypes[MM_N.gametype].allow_iframes
+	if (pmo.player.powers[pw_flashing] and use_iframes) then
+		return
+	end
+
 	if pmo.player and pmo.player.mm
 	and pmo.player.mm.role == ring.target.player.mm.role
 	and ring.target.player.mm.role ~= MMROLE_INNOCENT

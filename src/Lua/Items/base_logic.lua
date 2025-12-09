@@ -583,6 +583,7 @@ MM:addPlayerScript(function(p)
 	end
 
 	-- hit detection
+	local use_iframes = MM.Gametypes[MM_N.gametype].allow_iframes
 	if (item.damage or item.cantouch)
 	and item.hit
 	and not inv.hidden then
@@ -596,6 +597,10 @@ MM:addPlayerScript(function(p)
 			and p2.mo.health
 			and p2.mm
 			and not p2.mm.spectator) then continue end
+			
+			if (p2.powers[pw_flashing] and use_iframes) then
+				continue
+			end
 			
 			local dist = R_PointToDist2(p.mo.x, p.mo.y, p2.mo.x, p2.mo.y)
 			local maxdist = FixedMul(p.mo.radius+p2.mo.radius, item.range)
