@@ -2,9 +2,19 @@ local RESPAWNTIME = 5*TICRATE
 local respawn_anim = 0
 local halfsecond = TICRATE/2
 local POINTINC = 100
-local SCOREGOAL = 25 * POINTINC -- 25 kills
 local TR = TICRATE
 local playedsound = false
+
+MM_N.tvs_pointlimit = 25 * POINTINC -- 25 kills
+local function SetPointLimit()
+	local count = MM.countPlayers()
+	
+	MM_N.tvs_pointlimit = max(
+		-- every player should contribute at least 3 kills
+		(count.total - count.inactive) * 3,
+		10
+	) * POINTINC
+end
 
 local teamversus_mode = MM.RegisterGametype("Team Versus", {
 	tol = TOL_SAXAMM|TOL_MATCH;
@@ -28,6 +38,7 @@ local teamversus_mode = MM.RegisterGametype("Team Versus", {
 	allow_corpses = true;
 	allow_iframes = true;
 	force_small_role_hud = true;
+	tamer_tripmine = true;
 	items = {"revolver", "shotgun", "sword", "knife", "hyperlaser"};
 	rare_items = {"tripmine", "beartrap", "balloon", "luger"};
 	thinker = function()
@@ -43,17 +54,17 @@ local teamversus_mode = MM.RegisterGametype("Team Versus", {
 			return
 		end
 		
-		if (MM_N.tvs_mscore >= SCOREGOAL)
-		or (MM_N.tvs_sscore >= SCOREGOAL)
+		if (MM_N.tvs_mscore >= MM_N.tvs_pointlimit)
+		or (MM_N.tvs_sscore >= MM_N.tvs_pointlimit)
 			if not playedsound
 				S_StartSound(nil,sfx_lvpass)
 				S_StartSound(nil,sfx_nxbump)
 			end
 			playedsound = true
 		end
-		if (MM_N.tvs_mscore >= SCOREGOAL)
+		if (MM_N.tvs_mscore >= MM_N.tvs_pointlimit)
 			return true, 2
-		elseif (MM_N.tvs_sscore >= SCOREGOAL)
+		elseif (MM_N.tvs_sscore >= MM_N.tvs_pointlimit)
 			return true, 1
 		end
 	end;
@@ -96,6 +107,8 @@ local function lerp(frac,to,from)
 	return from + FixedMul(to - from, frac)
 end
 
+MM.addHook("Init", SetPointLimit)
+
 -- Show how many we're fighting against on round start
 MM.addHook("RoundStart", do
 	MM_N.tvs_mscore = 0
@@ -106,6 +119,7 @@ MM.addHook("RoundStart", do
 	local gt = MM.returnGametype()
 	if gt.name ~= "Team Versus" then return end
 	
+	SetPointLimit()
 	ShowStandings()
 end)
 MM.addHook("KilledPlayer", function(attacking_p, player)
@@ -262,7 +276,7 @@ MMHUD.addHud("TVS_GeneralHUD", false,false, function(v,p,c)
 			v.cachePatch("1PIXEL"), V_NOSCALESTART|V_50TRANS
 		)
 		v.drawString(x,y + 11*dup,
-			"First team to \x82"..SCOREGOAL.."\x80 points wins!",
+			"First team to \x82"..MM_N.tvs_pointlimit.."\x80 points wins!",
 			V_ALLOWLOWERCASE|V_NOSCALESTART,
 			"thin-center"
 		)
@@ -286,7 +300,7 @@ MMHUD.addHud("TVS_GeneralHUD", false,false, function(v,p,c)
 			temp_ms = lerp(lerp_frac, (MM_N.tvs_mscore or 0)*FU, $)
 			temp_ss = lerp(lerp_frac, (MM_N.tvs_sscore or 0)*FU, $)
 			
-			if max(temp_ms, temp_ss) >= (SCOREGOAL*FU) / 2
+			if max(temp_ms, temp_ss) >= (MM_N.tvs_pointlimit*FU) / 2
 			and temp_ms ~= temp_ss
 				indanger = (temp_ss > temp_ms) and -1 or 1
 				if (flip)
@@ -297,8 +311,8 @@ MMHUD.addHud("TVS_GeneralHUD", false,false, function(v,p,c)
 			if MM_N.voting then return end
 			local animfrac = FU
 			local murdwin
-			if not (MM_N.tvs_mscore >= SCOREGOAL
-			or MM_N.tvs_sscore >= SCOREGOAL)
+			if not (MM_N.tvs_mscore >= MM_N.tvs_pointlimit
+			or MM_N.tvs_sscore >= MM_N.tvs_pointlimit)
 				murdwin = MM_N.endType == 2
 				if not murdwin
 					temp_ms = lerp(lerp_frac, 0, $)
@@ -310,7 +324,7 @@ MMHUD.addHud("TVS_GeneralHUD", false,false, function(v,p,c)
 			else
 				temp_ms = lerp(lerp_frac, (MM_N.tvs_mscore or 0)*FU, $)
 				temp_ss = lerp(lerp_frac, (MM_N.tvs_sscore or 0)*FU, $)
-				murdwin = (MM_N.tvs_mscore >= SCOREGOAL)
+				murdwin = (MM_N.tvs_mscore >= MM_N.tvs_pointlimit)
 			end
 			
 			if MM_N.end_ticker < TR/2
@@ -328,13 +342,13 @@ MMHUD.addHud("TVS_GeneralHUD", false,false, function(v,p,c)
 		
 		local width = 140*scale
 		v.drawScaled(x,y, scale, v.cachePatch("MM_TVS_BG"), flags|(flip and V_FLIP or 0))
-		v.drawString(x,y + stroff, SCOREGOAL, V_YELLOWMAP|flags, "thin-fixed-center", true)
+		v.drawString(x,y + stroff, MM_N.tvs_pointlimit, V_YELLOWMAP|flags, "thin-fixed-center", true)
 		
 		-- murderers / teammates
 		score = temp_ms
 		if (flip) then score = temp_ss; end
 		pat = v.cachePatch(flip and "MM_TVS_MFILL_F" or "MM_TVS_MFILL")
-		frac = FixedDiv(min(score,SCOREGOAL*FU), SCOREGOAL*FU)
+		frac = FixedDiv(min(score,MM_N.tvs_pointlimit*FU), MM_N.tvs_pointlimit*FU)
 		v.drawCropped(x,y, scale,scale, pat,flags,nil, 0,0, FixedMul(pat.width*FU, frac),pat.height*FU)
 		v.drawString(x - width, y + stroff, score/FU, flags, "thin-fixed-center", true)
 		left = (x - rwid + pad) + FixedMul(pat.width*scale, frac)
@@ -344,7 +358,7 @@ MMHUD.addHud("TVS_GeneralHUD", false,false, function(v,p,c)
 		score = temp_ss
 		if (flip) then score = temp_ms; end
 		pat = v.cachePatch(flip and "MM_TVS_SFILL_F" or "MM_TVS_SFILL")
-		frac = FixedDiv(min(score,SCOREGOAL*FU), SCOREGOAL*FU)
+		frac = FixedDiv(min(score,MM_N.tvs_pointlimit*FU), MM_N.tvs_pointlimit*FU)
 		v.drawCropped(x+FixedMul(pat.width*scale, FU - frac),y, scale,scale, pat,flags,nil, FixedMul(pat.width*FU, max(FU - frac, 0)),0, pat.width*FU,pat.height*FU)
 		v.drawString(x + width, y + stroff, score/FU, flags, "thin-fixed-center", true)
 		right = (x + rwid - pad) - FixedMul(pat.width*scale, frac)

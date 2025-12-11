@@ -351,7 +351,7 @@ addHook("MobjDeath", function(target, inflictor, source, dmgt)
 			
 		corpse.shadowscale = target.shadowscale
 		corpse.radius = target.radius
-		if not MM_N.knownDeadPlayers[#target.player]
+		if not (MM_N.knownDeadPlayers[#target.player] or gt.reveal_roles)
 			corpse.translation = "Grayscale"
 		end
 		--corpses dont have colormaps?
@@ -516,7 +516,7 @@ addHook("ThinkFrame", function()
 			P_MoveOrigin(player.mo, corpse.x,corpse.y,corpse.z)
 		end
 		
-        if MM_N.knownDeadPlayers[corpse.playerid]
+        if (MM_N.knownDeadPlayers[corpse.playerid] or gt.reveal_roles)
         and (corpse.translation)
             corpse.translation = nil
         end
