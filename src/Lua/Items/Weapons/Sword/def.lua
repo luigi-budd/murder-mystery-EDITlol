@@ -16,9 +16,9 @@ weapon.timeleft = -1
 weapon.hit_time = 2
 weapon.animation_time = TICRATE + TICRATE/2
 weapon.cooldown_time = TICRATE
-weapon.range = FU*5
+weapon.range = FU*5 + FU/2
 --you should be able to jump over and juke the murderer
-weapon.zrange = FU*3/4
+weapon.zrange = FU * 6/5
 weapon.position = {
 	x = FU,
 	y = 0,

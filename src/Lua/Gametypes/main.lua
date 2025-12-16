@@ -9,6 +9,7 @@ local gametype_t = {
 	
 	disable_duels = false,
 	allow_iframes = false, -- if true, players cannot be damaged with iframes
+	allow_payouts = true, -- if true, pay people at the end of rounds
 }
 registerMetatable(gametype_t)
 

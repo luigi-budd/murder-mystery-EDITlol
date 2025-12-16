@@ -83,6 +83,8 @@ return function(self, endType, nofreeze)
 	if (MM_N.waiting_for_players) then return end
 	if MM_N.restartingformap then return end
 	if (MM:pregame()) then return end
+	local gt = MM.returnGametype()
+	if not gt.allow_payouts then return end
 	
 	--this makes me sad
 	local sheriff = 

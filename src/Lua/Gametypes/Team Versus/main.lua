@@ -20,7 +20,7 @@ local teamversus_mode = MM.RegisterGametype("Team Versus", {
 	tol = TOL_SAXAMM|TOL_MATCH;
 	max_time = (2*60*TICRATE) + (30 * TICRATE);
 	required_players = 8;
-	inventory_count = 2;
+	inventory_count = 4;
 	fill_teams = true;
 	disable_item_mapthing = true; -- includes interactions that drop items.
 	disable_perks = true;
@@ -37,9 +37,11 @@ local teamversus_mode = MM.RegisterGametype("Team Versus", {
 	allow_respawn = true;
 	allow_corpses = true;
 	allow_iframes = true;
+	allow_payouts = false;
 	force_small_role_hud = true;
 	tamer_tripmine = true;
-	items = {"revolver", "shotgun", "sword", "knife", "hyperlaser"};
+	items = {"revolver", "shotgun", "hyperlaser"};
+	melees = {"sword", "knife"};
 	rare_items = {"tripmine", "beartrap", "balloon", "luger"};
 	thinker = function()
 		if (MM_N.time <= 0 or MM_N.showdown)
@@ -197,17 +199,23 @@ MM.addHook("PlayerSpawn", function(p)
 	
 	if not (p.mo and p.mo.valid) then return end
 	
-	-- 30% chance to get something else
-	if P_RandomChance(FU*3/10)
-		local item = gt.rare_items[P_RandomRange(1, #gt.rare_items)]
+	-- Only run this when we respawn
+	if mm.got_weapon
+		local item = gt.items[P_RandomRange(1, #gt.items)]
+		MM:GiveItem(p, item)
+ 	end
+	-- give a melee secondary
+	do
+		local item = gt.melees[P_RandomRange(1, #gt.melees)]
 		MM:GiveItem(p, item, 2)
 	end
 	
-	-- Only run this when we respawn
-	if not mm.got_weapon then return end
+	-- 30% chance to get something else
+	if P_RandomChance(FU*3/10)
+		local item = gt.rare_items[P_RandomRange(1, #gt.rare_items)]
+		MM:GiveItem(p, item, 3)
+	end
 	
-	local item = gt.items[P_RandomRange(1, #gt.items)]
-	MM:GiveItem(p, item)
 end)
 
 MM.addHook("DropItemThinker", function(item, mobj)
@@ -215,6 +223,10 @@ MM.addHook("DropItemThinker", function(item, mobj)
 	if gt.name ~= "Team Versus" then return end
 	
 	if mobj.fuse < 0
+		if P_RandomChance(FU/5)
+			P_RemoveMobj(mobj)
+			return
+		end
 		mobj.fuse = 10 * TR
 	end
 end)

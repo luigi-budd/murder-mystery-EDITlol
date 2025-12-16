@@ -78,7 +78,7 @@
 			
 		* "ItemDrop", function(player_t player, itemdef_t def, item_t item)
 			Executes when a player drops an item by choice. This will not trigger
-			during pregame or when forcibly dropped, like when a murderer picks up the
+			during pregame or when forcibly dropped, like when a murderer loses the
 			revolver, for example.
 			- Return value: Boolean (override default behavior?)
 			
