@@ -8,25 +8,29 @@ MM.BulletDies = function(mo, moagainst, line)
 	end
 	if mo.nobulletfx then return end
 	
-	for i = 0, P_RandomRange(2,5)
-		local ghs = P_SpawnMobjFromMobj(mo,
-			P_RandomRange(-spread,spread)*FU,
-			P_RandomRange(-spread,spread)*FU,
-			P_RandomRange(-spread,spread)*FU,
-			MT_SMOKE
-		)
-		--get rid of interp
-		P_SetOrigin(ghs, ghs.x,ghs.y,ghs.z)
+	if not mo.nosmoke
+		for i = 0, P_RandomRange(2,5)
+			local ghs = P_SpawnMobjFromMobj(mo,
+				P_RandomRange(-spread,spread)*FU,
+				P_RandomRange(-spread,spread)*FU,
+				P_RandomRange(-spread,spread)*FU,
+				MT_SMOKE
+			)
+			--get rid of interp
+			P_SetOrigin(ghs, ghs.x,ghs.y,ghs.z)
+		end
 	end
 	
 	local sfx = P_SpawnGhostMobj(mo)
 	sfx.flags2 = $|MF2_DONTDRAW
 	sfx.fuse = TICRATE
-
-	if mo.info.deathsound == nil then
-		S_StartSound(sfx,sfx_turhit)
-	else
-		S_StartSound(sfx,mo.info.deathsound)
+	
+	if not mo.nodeathsound
+		if mo.info.deathsound == nil then
+			S_StartSound(sfx,sfx_turhit)
+		else
+			S_StartSound(sfx,mo.info.deathsound)
+		end
 	end
 	
 	local angle = mo.angle + ANGLE_90
@@ -274,8 +278,9 @@ MM.BulletHit = function(ring,pmo)
 			end
 			
             ring.nobulletholes = true
+			ring.hitsomething = true
 			MM.BulletDies(ring)
-			P_RemoveMobj(ring)
+			P_KillMobj(ring)
 		end
 		return
 	end
@@ -291,21 +296,23 @@ MM.BulletHit = function(ring,pmo)
 	and pmo.player.mm.role == ring.target.player.mm.role
 	and ring.target.player.mm.role ~= MMROLE_INNOCENT
 		ring.nobulletholes = true
+		ring.hitsomething = true
 		MM.BulletDies(ring)
-		P_RemoveMobj(ring)
+		P_KillMobj(ring)
 		return
 	end
 	
 	P_DamageMobj(pmo, ring, (ring.target and ring.target.valid) and ring.target or ring, 999, DMG_INSTAKILL)
 	ring.nobulletholes = true
-
+	ring.hitsomething = true
+	
 	local def = MM.Items[ring.origin.id]
 	if def.hitplayer
 		def.hitplayer(ring, pmo)
 	end
 
     MM.BulletDies(ring)
-	P_RemoveMobj(ring)
+	P_KillMobj(ring)
 end
 
 -- Sheriff weapons

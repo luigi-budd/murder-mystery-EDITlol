@@ -160,6 +160,9 @@ weapon.thinker = function(item, p)
 			S_StartSound(nil, sfx_kcharg, p)
 		end
 		
+		if item.altfiretime == throw_tic - 1
+			S_StartSound(me, sfx_s3k76) -- intentionally audible
+		end
 		item.altfiretime = min($ + 1, throw_tic)
 		item.damage = false
 		item.hit = 0
@@ -205,6 +208,7 @@ weapon.thinker = function(item, p)
 			item.mobj.spriteyoffset = 0
 			S_StartSound(p.mo, weapon.misssfx)
 			S_StartSound(p.mo, weapon.misssfx)
+			S_StopSoundByID(p.mo, sfx_s3k76)
 			--play this from the missile instead
 			--S_StartSoundAtVolume(p.mo, throw_sfx, 255 * 2/10)
 			

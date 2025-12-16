@@ -12,6 +12,22 @@ states[freeslot("S_MM_KNIFE_SPIN")] = {
 	nextstate = S_MM_KNIFE_SPIN
 }
 
+local function impactfx(mo)
+	local sfx = P_SpawnGhostMobj(mo)
+	sfx.tics = TR; sfx.fuse = TR
+	sfx.flags2 = $|MF2_DONTDRAW
+	S_StartSound(sfx, P_RandomRange(sfx_kimp0, sfx_kimp2))
+	
+	mo.momx,mo.momy,mo.momz = 0,0,0
+end
+
+states[freeslot("S_MM_KNIFE_STUCK")] = {
+	sprite = SPR_KNFE,
+	frame = G|FF_FULLBRIGHT,
+	tics = 2 * TICRATE,
+	action = impactfx
+}
+
 sfxinfo[freeslot("sfx_kequip")].caption = "Knife equip"
 sfxinfo[freeslot("sfx_kffire")] = { 
 	caption = "Stab",
@@ -19,6 +35,15 @@ sfxinfo[freeslot("sfx_kffire")] = {
 }
 sfxinfo[freeslot("sfx_kwhiff")].caption = "Whiff"
 sfxinfo[freeslot("sfx_kcharg")].caption = "Charging"
+sfxinfo[freeslot("sfx_kfly")] = {
+	caption = "Knife flying",
+	flags = SF_X2AWAYSOUND
+}
+for i = 0,2
+	sfxinfo[freeslot("sfx_kimp" .. i)] = {
+		caption = "Knife impact"
+	}
+end
 
 --Sprite credit: instashield by pastel
 states[freeslot("S_MM_KNIFE_WHIFF")] = {
@@ -30,25 +55,41 @@ states[freeslot("S_MM_KNIFE_WHIFF")] = {
 }
 
 mobjinfo[freeslot("MT_MM_KNIFE_PROJECT")] = {
-	radius = 8*FU,
+	radius = 12*FU,
 	height = 24*FU,
 	spawnstate = S_MM_KNIFE_SPIN,
 	flags = MF_NOGRAVITY,
 	--move in quarter steps
 	speed = 100*FU / 4,
-	deathstate = S_SPRK1
+	deathstate = S_MM_KNIFE_STUCK
 }
---local tics_til_grav = 12
+
+local tics_til_grav = 12
 addHook("MobjThinker",function(mo)
 	if not (mo and mo.valid) then return end
 	if not mo.health
-		mo.momx,mo.momy,mo.momz = 0,0,0
 		mo.renderflags = $|RF_FULLBRIGHT
+		S_StopSound(mo)
+		if mo.tics < TICRATE / 2
+			mo.flags2 = $^^MF2_DONTDRAW
+		end
+		if mo.hitsomething
+			mo.flags = $ &~MF_NOGRAVITY
+			if P_IsObjectOnGround(mo)
+				mo.momz = -(mo.lastmomz or 0) * 5/6
+				P_InstaThrust(mo, mo.angle, -2 * mo.scale)
+			end
+			mo.lastmomz = mo.momz
+			mo.rollangle = $ + ANG10
+		else
+			mo.momx,mo.momy,mo.momz = 0,0,0
+		end
 		return
 	end
 	if mo.timealive == nil
 		mo.timealive = 0
-		mo.nobulletfx = true
+		mo.nosmoke = true
+		mo.nodeathsound = true
 		
 		--speed
 		P_InstaThrust(mo, mo.angle,
@@ -58,16 +99,19 @@ addHook("MobjThinker",function(mo)
 		S_StartSound(mo, sfx_cdfm35)
 	end
 	
+	if not S_SoundPlaying(mo, sfx_kfly)
+		S_StartSound(mo, sfx_kfly)
+	end
 	mo.timealive = $ + 1
 	/*
 	if mo.timealive == tics_til_grav
 		mo.flags = $ &~MF_NOGRAVITY
 	end
-	*/
-	if mo.timealive == TICRATE
+	if mo.timealive == TICRATE * 3/2
 		P_KillMobj(mo)
 		return
 	end
+	*/
 	
 	for i = 1,3
 		P_XYMovement(mo)
@@ -80,17 +124,31 @@ addHook("MobjThinker",function(mo)
 		local g = P_SpawnGhostMobj(mo)
 		g.blendmode = AST_ADD
 		g.renderflags = $|RF_FULLBRIGHT
+		g.destscale = 0
 		g.translation = "Grayscale"
 	end
 	
 	if (mo.z <= mo.floorz)
 	or (mo.z + mo.height >= mo.ceilingz)
+		impactfx(mo)
+		MM.BulletDies(mo)
 		P_KillMobj(mo)
+		return
 	end
+	
+	local scaleup = (mo.scale * 3/4)
+	mo.radius = $ + scaleup/2
+	if not (mo and mo.valid)
+		return
+	end
+	mo.height = $ + scaleup
+
 end,MT_MM_KNIFE_PROJECT)
 
-addHook("MobjMoveBlocked",function(mo)
+addHook("MobjMoveBlocked",function(mo, against,line)
 	if (mo and mo.valid and mo.health and not mo.safeknife)
+		impactfx(mo)
+		MM.BulletDies(mo, against, line)
 		P_KillMobj(mo)
 	end
 end,MT_MM_KNIFE_PROJECT)
