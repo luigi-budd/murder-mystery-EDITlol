@@ -17,7 +17,7 @@ end, COM_ADMIN)
 COM_AddCommand("MM_EndGame", function(p)
 	if not MM:isMM() then return end
 
-	MM:endGame(1)
+	MM:endGame(MMEND_MURDERERSWIN)
 	MM_N.killing_end = false
 	MM_N.disconnect_end = true
 	MM_N.end_ticker = 3*TICRATE - 1

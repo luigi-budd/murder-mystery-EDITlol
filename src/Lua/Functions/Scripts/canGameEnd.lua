@@ -1,3 +1,8 @@
+-- this doesnt look like a good place for this EITHER...
+-- but i dont know WHY saxa made these magic numbers
+rawset(_G, "MMEND_SHERIFFSWIN", 1)
+rawset(_G, "MMEND_MURDERERSWIN", 2)
+
 return function(self)
 	if MM_N.gameover then 
 		return false
@@ -26,10 +31,10 @@ return function(self)
 			if isValid(player) then
 				if not player.mo.health then
 					if player.mm.role == MMROLE_MURDERER then
-						MM:endGame(1) -- if player died and is murderer. innocents win
+						MM:endGame(MMEND_SHERIFFSWIN) -- if player died and is murderer. innocents win
 						return true
 					else
-						MM:endGame(2) -- if player died and is not murderer. murderers win
+						MM:endGame(MMEND_MURDERERSWIN) -- if player died and is not murderer. murderers win
 						return true
 					end
 					
@@ -68,10 +73,10 @@ return function(self)
 		end
 
 		if not innocent then
-			return true, 2
+			return true, MMEND_MURDERERSWIN
 		end
 		if not murderer then
-			return true, 1
+			return true, MMEND_SHERIFFSWIN
 		end
 	end
 

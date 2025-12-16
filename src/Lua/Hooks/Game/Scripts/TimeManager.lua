@@ -98,7 +98,7 @@ return function()
 			) and not MM.Gametypes[MM_N.gametype].disable_overtime
 				MM:startOvertime()
 			else
-				MM:endGame(1)
+				MM:endGame(MMEND_SHERIFFSWIN)
 				MM_N.disconnect_end = true
 				MM_N.end_ticker = 3*TICRATE - 1
 				S_StartSound(nil,sfx_s253)

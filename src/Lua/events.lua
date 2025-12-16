@@ -18,6 +18,9 @@
 		
 		* "RoundStart", function()
 			Executes when the round starts, ie. when Pregame ends, and after duel status and round time has been set.
+			
+		* "RoundEnd", function()
+			Executes when the game ends but before the killcam starts.
 
 	--[Player]--
 		* "PlayerInit", function(player_t, boolean midgame?)
@@ -125,6 +128,7 @@ local events = {}
 events["PostMapLoad"] = {}
 events["Init"] = {}
 events["RoundStart"] = {}
+events["RoundEnd"] = {}
 events["PlayerInit"] = {}
 events["PlayerSpawn"] = {}
 events["PlayerThink"] = {}

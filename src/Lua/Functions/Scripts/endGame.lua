@@ -21,6 +21,11 @@ MM.endTypes = {
 return function(self, endType, nofreeze)
 	if MM_N.gameover then return end
 
+	local hook_event = MM.events["RoundEnd"]
+	for i,v in ipairs(hook_event)
+		MM.tryRunHook("RoundEnd", v)
+	end
+	
 	-- select theme
 	local themes = {}
 	for k,v in pairs(MM.themes) do
@@ -32,7 +37,7 @@ return function(self, endType, nofreeze)
 		MM.themes[MM_N.theme].init(endType)
 	end
 
-	local endType = MM.endTypes[endType] or 1
+	local endType = MM.endTypes[endType or MMEND_SHERIFFSWIN]
 	MM:discordMessage("***"..endType.msg.."***\n")
 	
 	MM_N.endType = endType

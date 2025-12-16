@@ -108,6 +108,13 @@ local function lerp(frac,to,from)
 end
 
 MM.addHook("Init", SetPointLimit)
+MM.addHook("PostMapLoad",do
+	for p in players.iterate
+		p.mtvs_score = 0
+		p.mtvs_deaths = 0
+	end
+	SetPointLimit()
+end)
 
 -- Show how many we're fighting against on round start
 MM.addHook("RoundStart", do
@@ -187,6 +194,8 @@ MM.addHook("PlayerSpawn", function(p)
 			mm.role = MMROLE_MURDERER
 		end
 	end
+	
+	if not (p.mo and p.mo.valid) then return end
 	
 	-- 30% chance to get something else
 	if P_RandomChance(FU*3/10)
@@ -313,7 +322,7 @@ MMHUD.addHud("TVS_GeneralHUD", false,false, function(v,p,c)
 			local murdwin
 			if not (MM_N.tvs_mscore >= MM_N.tvs_pointlimit
 			or MM_N.tvs_sscore >= MM_N.tvs_pointlimit)
-				murdwin = MM_N.endType == 2
+				murdwin = MM_N.endType == MMEND_MURDERERSWIN
 				if not murdwin
 					temp_ms = lerp(lerp_frac, 0, $)
 					temp_ss = lerp(lerp_frac, (MM_N.tvs_sscore or 0)*FU, $)
