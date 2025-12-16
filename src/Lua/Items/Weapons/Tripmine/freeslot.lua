@@ -405,6 +405,10 @@ local function ThreeDThinker(door)
 	
 end
 
+local function randomfix(a,b)
+	return a + FixedMul((b - a), P_RandomFixed())
+end
+
 addHook("MobjThinker",function(mine)
 	if not (mine and mine.valid) then return end
 	
@@ -415,7 +419,61 @@ addHook("MobjThinker",function(mine)
 		mine.markedfordeath = $ - 1
 		mine.fade = 0
 		mine.translation = "Invert"
-		mine.flags = $ &~MF_SHOOTABLE
+		mine.flags = $ &~(MF_SHOOTABLE|MF_SPECIAL)
+		
+		if mine.imgonnaDIEsoon == nil
+			mine.imgonnaDIEsoon = 0
+			mine.angles = {}
+			local extent = FU/2
+			for i = 1, 32
+				mine.angles[i] = FixedAngle(randomfix(-extent,extent))
+			end
+			
+			mine.zmoves = {}
+			for i = 1, 32
+				mine.zmoves[i] = 0
+			end
+		end
+		
+		if mine.imgonnaDIEsoon ~= 8
+			mine.imgonnaDIEsoon = $ + 1
+			
+			local angs = 32
+			local afrac = FixedDiv(360*FU, angs*FU)
+			local fracs = 8
+			local dist = FixedDiv(550 * FU, fracs*FU)
+			for i = 1, angs
+				local aim_a = mine.angles[i]
+				local aim = sin(aim_a)
+				local ang = FixedAngle(afrac * i)
+				do
+					local j = mine.imgonnaDIEsoon
+					local g = P_SpawnMobjFromMobj(mine,
+						P_ReturnThrustX(nil, ang, dist*j),
+						P_ReturnThrustY(nil, ang, dist*j),
+						mine.zmoves[i], MT_PARTICLE
+					)
+					g.state = S_SHOCKWAVE1
+					g.color = SKINCOLOR_GALAXY
+					g.colorized = true
+					g.renderflags = $|RF_FULLBRIGHT|RF_NOCOLORMAPS
+					g.fuse = (g.tics * 2) - mine.imgonnaDIEsoon
+					g.angle = ang
+					if j == fracs
+						g.angle = $ + ANGLE_90
+						g.spriteyscale = $ * 2
+						g.spriteyoffset = -15*FU
+					else
+						g.alpha = FixedDiv(dist*j, dist*fracs) * 4/5
+						g.rollangle = aim_a
+						g.blendmode = AST_ADD
+						g.angle = $ + FixedAngle(randomfix(-15*FU, 15*FU))
+					end
+					mine.zmoves[i] = $ + FixedMul(dist*fracs, aim)
+				end
+			end
+			
+		end
 		
 		if mine.markedfordeath == 0
 			P_KillMobj(mine, mine.deathvar[1], mine.deathvar[2])
@@ -439,7 +497,6 @@ addHook("MobjThinker",function(mine)
 			end
 			
 		end
-		
 	end
 	
 	if not mine.activatein

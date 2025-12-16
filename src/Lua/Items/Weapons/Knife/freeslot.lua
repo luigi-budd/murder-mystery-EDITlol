@@ -76,10 +76,9 @@ addHook("MobjThinker",function(mo)
 		if mo.hitsomething
 			mo.flags = $ &~MF_NOGRAVITY
 			if P_IsObjectOnGround(mo)
-				mo.momz = -(mo.lastmomz or 0) * 5/6
+				P_SetObjectMomZ(mo, 3*FU)
 				P_InstaThrust(mo, mo.angle, -2 * mo.scale)
 			end
-			mo.lastmomz = mo.momz
 			mo.rollangle = $ + ANG10
 		else
 			mo.momx,mo.momy,mo.momz = 0,0,0
