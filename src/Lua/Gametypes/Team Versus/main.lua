@@ -16,7 +16,7 @@ local function SetPointLimit()
 	) * POINTINC
 end
 
-local teamversus_mode = MM.RegisterGametype("Team Versus", {
+local teamversus_mode = MM.RegisterGametype("Team Versus", "team_versus", {
 	tol = TOL_SAXAMM|TOL_MATCH;
 	max_time = (2*60*TICRATE) + (30 * TICRATE);
 	required_players = 8;

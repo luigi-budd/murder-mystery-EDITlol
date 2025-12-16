@@ -13,7 +13,7 @@ local gametype_t = {
 }
 registerMetatable(gametype_t)
 
-function MM.RegisterGametype(name, _data)
+function MM.RegisterGametype(name, identifier, _data)
 	local gametype_id = #MM.Gametypes + 1
 	_data = $ or {}
 	
@@ -22,6 +22,11 @@ function MM.RegisterGametype(name, _data)
 	})
 	MM.Gametypes[gametype_id] = _data
 	MM.Gametypes[gametype_id].name = name
+	-- the idea behind this "identifier" field is for TOL_/GT_ stuff
+	-- if a mapheader has `Lua.MM_Disallow_[identifier] = true`, then
+	-- it wont pop up in the mapvote for that gametype
+	-- this functionality is unimplemented as of right now
+	MM.Gametypes[gametype_id].identifier = identifier
 	MM.Gametypes[gametype_id].id = gametype_id
 	
 	return MM.Gametypes[gametype_id]
@@ -34,6 +39,6 @@ end
 
 -- MM_N.maxtime has a different variable name than Gametype[id].max_time
 
-MM.RegisterGametype("Classic")
+MM.RegisterGametype("Classic", "classic")
 
 dofile("Gametypes/Team Versus/main")
