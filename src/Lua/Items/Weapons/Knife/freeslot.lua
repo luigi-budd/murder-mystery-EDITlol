@@ -41,7 +41,8 @@ sfxinfo[freeslot("sfx_kfly")] = {
 }
 for i = 0,2
 	sfxinfo[freeslot("sfx_kimp" .. i)] = {
-		caption = "Knife impact"
+		caption = "Knife impact",
+		flags = SF_X2AWAYSOUND
 	}
 end
 

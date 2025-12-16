@@ -274,6 +274,7 @@ MM.BulletHit = function(ring,pmo)
 				if pmo.type == MT_MM_TRIPMINE
 					pmo.markedfordeath = TICRATE / 2
 					pmo.deathvar = {ring, ring.target}
+					S_StartSound(pmo, sfx_buzz3)
 				else
 					P_DamageMobj(pmo, ring, (ring.target and ring.target.valid) and ring.target or ring, 2)
 				end

@@ -56,11 +56,10 @@ return function(self)
 		if data.bonustype then continue end
 
 		local chosen_gametype = 1
-		if P_RandomChance(FU/8) and #MM.Gametypes > 1 and MM_N.forced_gametype == nil then
+		if P_RandomChance(FU/11) and #MM.Gametypes > 1 and MM_N.forced_gametype == nil then
 			chosen_gametype = P_RandomRange(2, #MM.Gametypes) -- set type to random mode
 			
 			local gmt = MM.Gametypes[chosen_gametype]
-
 			if gmt.required_players and player_count < gmt.required_players then
 				chosen_gametype = 1 -- revert back to gametype 1 if not enough players.
 			end
