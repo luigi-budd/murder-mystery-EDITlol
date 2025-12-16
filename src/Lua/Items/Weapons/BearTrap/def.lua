@@ -135,7 +135,7 @@ weapon.drop = function(item,p, mobj)
 	if (item.ghost and item.ghost.valid)
 		P_RemoveMobj(item.ghost)
 	end
-	
+	if not (mobj and mobj.valid) then return end
 	mobj.ammo = item.ammoleft
 	mobj.max_ammo = weapon.maxshots
 end

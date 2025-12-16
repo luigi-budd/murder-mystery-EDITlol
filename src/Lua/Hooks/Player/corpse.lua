@@ -430,7 +430,7 @@ addHook("ThinkFrame", function()
 			p.mo.flags = $ &~MF_NOGRAVITY
 			p.mo.state = S_PLAY_DEAD
 			
-			P_InstaThrust(p.mo, p.mo.deathangle, -6*FU)
+			P_InstaThrust(p.mo, p.mo.deathangle or p.mo.angle, -6*FU)
 			P_SetObjectMomZ(p.mo, 20*FU)
 			S_StartSound(p.mo, sfx_altdi1)
 			
