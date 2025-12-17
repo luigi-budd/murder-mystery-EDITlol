@@ -67,8 +67,12 @@ return function(self)
 		elseif MM_N.forced_gametype ~= nil then
 			chosen_gametype = MM_N.forced_gametype
 		end
-
+		
 		if not (data.typeoflevel & MM.Gametypes[chosen_gametype].tol) then
+			continue
+		end
+		-- data.Lua.MM_Disallow_[gametype_identifier]
+		if data["mm_disallow_" .. (MM.Gametypes[chosen_gametype].identifier)] then
 			continue
 		end
 		

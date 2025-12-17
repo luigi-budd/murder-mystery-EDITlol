@@ -13,6 +13,7 @@ local gametype_t = {
 }
 registerMetatable(gametype_t)
 
+-- identifier must not have spaces and should be all lowercase
 function MM.RegisterGametype(name, identifier, _data)
 	local gametype_id = #MM.Gametypes + 1
 	_data = $ or {}
