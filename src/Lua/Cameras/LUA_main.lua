@@ -653,7 +653,6 @@ addHook("MobjThinker",function(cam)
 	
 	if (args.repair and args.repair.valid)
 		if not cam.health
-			args.repair.cooldown = 0
 			for p in players.iterate
 				MM.interactPoint(p, args.repair, {
 					name = "Camera",
@@ -664,8 +663,41 @@ addHook("MobjThinker",function(cam)
 				})			
 			end
 			P_MoveOrigin(args.repair, cam.x,cam.y,cam.z)
-		else
-			args.repair.cooldown = 10
+			
+			if P_RandomChance(FU/32)
+				local sfx = P_SpawnGhostMobj(args.repair)
+				sfx.fuse = 4
+				sfx.flags2 = $|MF2_DONTDRAW
+				S_StartSound(sfx, sfx_beelec)
+				
+				local sp = P_SpawnMobjFromMobj(args.repair,
+					P_RandomRange(-10, 10)*FU,
+					P_RandomRange(-10, 10)*FU,
+					P_RandomRange(-10, 10)*FU,
+					MT_WATERZAP
+				)
+				P_SetScale(sp, sp.scale * 2, true)
+				sp.flags = $ &~MF_NOGRAVITY
+				sp.spritexscale = $ / 2
+				sp.spriteyscale = sp.spritexscale
+				sp.renderflags = $|RF_FULLBRIGHT
+			end
+			if (leveltime % 25 == 0)
+				local sp = P_SpawnMobjFromMobj(args.repair,
+					P_RandomRange(-10, 10)*FU,
+					P_RandomRange(-10, 10)*FU,
+					P_RandomRange(-10, 10)*FU,
+					MT_MINECARTSPARK
+				)
+				P_SetObjectMomZ(sp, P_RandomRange(-3, 3)*FU)
+				P_InstaThrust(sp,
+					FixedAngle(P_RandomRange(0,360)*FU),
+					3 * FU
+				)
+				
+				sp.flags = $ &~MF_NOGRAVITY
+				sp.fuse = TICRATE
+			end
 		end
 	end
 	

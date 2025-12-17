@@ -84,7 +84,7 @@ MM.BulletDies = function(mo, moagainst, line)
 		spark.destscale = 0
 		spark.scalespeed = FixedDiv(spark.scale, spark.fuse*FU)
 		*/
-
+		
 		if mo.info.sparkvfx_func then
 			mo.info.sparkvfx_func(spark)
 		end

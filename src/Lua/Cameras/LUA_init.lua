@@ -127,16 +127,16 @@ MMCAM.CameraSay = function(player,cam,message)
 
 	for p in players.iterate
 		if p == player then continue end
-
+		
 		local me = p.realmo
-
+		
 		if not (me and me.valid) then continue end
 		if not P_CheckSight(me,cam) then continue end
-
+		
 		local dist = R_PointToDist2(me.x,me.y, cam.x,cam.y)
-
+		
 		if dist > MMCAM.far_dist*cam.scale then continue end
-
+		
 		local disttext = "[NEAR]"
 		local workmsg = message
 		do
@@ -149,7 +149,7 @@ MMCAM.CameraSay = function(player,cam,message)
 					continue
 				end
 			end
-
+			
 			workmsg = "\x86"..disttext.."\x80".." "..$
 		end
 		
@@ -178,5 +178,5 @@ MMCAM.interaction = MM.addInteraction(function(p,mo)
 	cam.args.hitbox.camhitbox = true
 	cam.args.hitbox.tics = -1
 	cam.args.hitbox.fuse = -1
-	
+	S_StartSound(cam.args.hitbox, sfx_ncspec)
 end,"Cameras_RepairAThing")
