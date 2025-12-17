@@ -119,7 +119,8 @@ MM.FireBullet = function(p,def,item, angle, aiming, callhooks)
 	
 	item.anim = item.max_anim
 	item.cooldown = item.max_cooldown
-
+	
+	local bullet
 	if item.shootable then
 		--THIS IS GLORPSHIT
 		/*
@@ -134,7 +135,7 @@ MM.FireBullet = function(p,def,item, angle, aiming, callhooks)
 		offset = FixedMul($,p.mo.scale)
 		*/
 		
-		local bullet = P_SpawnMobjFromMobj(p.mo,
+		bullet = P_SpawnMobjFromMobj(p.mo,
 			--dont spawn in the wall
 			P_ReturnThrustX(nil,angle, 2*FU),
 			P_ReturnThrustY(nil,angle, 2*FU),
@@ -583,6 +584,7 @@ MM:addPlayerScript(function(p)
 	end
 
 	-- hit detection
+	-- melee code
 	local use_iframes = MM.Gametypes[MM_N.gametype].allow_iframes
 	if (item.damage or item.cantouch)
 	and item.hit

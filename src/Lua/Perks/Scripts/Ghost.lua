@@ -18,6 +18,7 @@ local TR = TICRATE
 local icon_name = "MM_PI_GHOST"
 local icon_scale = FU/2
 
+-- dont forget to update the description if these change
 local perk_maxtime = 8*TR
 local perk_cooldown = 20*TR
 local perk_volume = (255)/4

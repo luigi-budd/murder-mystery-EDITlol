@@ -35,6 +35,20 @@ MM_PERKS.perkActiveDown = function(p, inSecondSlot)
 end
 */
 
+-- Returns 1 or 2 depending on which slot perkid is in, 0 if not equipped
+MM_PERKS.playerHasPerk = function(p, perkid)
+	if not p.mm_save then return 0; end
+	local gt = MM.returnGametype()
+	if gt.disable_perks then return 0; end
+	
+	if p.mm_save.pri_perk == perkid
+		return 1
+	elseif p.mm_save.sec_perk == perkid
+		return 2
+	end
+	return 0
+end
+
 dofile(path.."Footsteps")
 dofile(path.."Ninja")
 dofile(path.."FakeGun")

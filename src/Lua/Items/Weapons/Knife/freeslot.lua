@@ -13,12 +13,14 @@ states[freeslot("S_MM_KNIFE_SPIN")] = {
 }
 
 local function impactfx(mo)
+	mo.momx,mo.momy,mo.momz = 0,0,0
+	
+	if mo.ninja then return end
+	
 	local sfx = P_SpawnGhostMobj(mo)
 	sfx.tics = TR; sfx.fuse = TR
 	sfx.flags2 = $|MF2_DONTDRAW
-	S_StartSound(sfx, P_RandomRange(sfx_kimp0, sfx_kimp2))
-	
-	mo.momx,mo.momy,mo.momz = 0,0,0
+	S_StartSoundAtVolume(sfx, P_RandomRange(sfx_kimp0, sfx_kimp2), 255 * 3/5)
 end
 
 states[freeslot("S_MM_KNIFE_STUCK")] = {
@@ -45,6 +47,7 @@ for i = 0,2
 		flags = SF_X2AWAYSOUND
 	}
 end
+sfxinfo[freeslot("sfx_khitm")].caption = "Hitmarker"
 
 --Sprite credit: instashield by pastel
 states[freeslot("S_MM_KNIFE_WHIFF")] = {
@@ -96,11 +99,17 @@ addHook("MobjThinker",function(mo)
 			FixedMul(mo.info.speed, cos(mo.aiming))
 		)
 		mo.momz = FixedMul(mo.info.speed, sin(mo.aiming))
-		S_StartSound(mo, sfx_cdfm35)
+		if mo.ninja ~= 1
+			S_StartSound(mo, sfx_cdfm35)
+		end
 	end
 	
 	if not S_SoundPlaying(mo, sfx_kfly)
-		S_StartSound(mo, sfx_kfly)
+		local vol = 255
+		if mo.ninja
+			vol = $ / 3
+		end
+		S_StartSoundAtVolume(mo, sfx_kfly, vol)
 	end
 	mo.timealive = $ + 1
 	/*

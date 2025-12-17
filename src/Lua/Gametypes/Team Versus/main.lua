@@ -79,7 +79,6 @@ local teamversus_mode = MM.RegisterGametype("Team Versus", "team_versus", {
 })
 
 local dohitmarker = 0
-sfxinfo[freeslot("sfx_hitmrk")].caption = "Hitmarker"
 
 local ANIM = 2*TICRATE
 local FADEIN = 6
@@ -140,8 +139,8 @@ MM.addHook("KilledPlayer", function(attacking_p, player)
 	and (attacking_p and attacking_p.valid)
 	and (consoleplayer == attacking_p)
 		dohitmarker = 8
-		S_StartSound(nil, sfx_hitmrk, consoleplayer)
-		S_StartSoundAtVolume(nil, sfx_hitmrk, 255/2, consoleplayer) --Bruh
+		S_StartSound(nil, sfx_khitm, consoleplayer)
+		S_StartSoundAtVolume(nil, sfx_khitm, 255/2, consoleplayer) --Bruh
 	end
 	
 	if player.mm.role == MMROLE_MURDERER

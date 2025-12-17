@@ -31,12 +31,15 @@ MM_PERKS[MMPERK_NINJA] = {
 	description = {
 		"\x82Primary:\x80 Your knife is 50% invisible.",
 		"Equiping, swinging, and kills will be 100%",
-		"silent.",
+		"silent. Charging knives, and throwing knives",
+		"will be completely silent. Thrown",
+		"knives flying are slightly quieter.",
 		
 		"",
 		
 		"\x82Secondary:\x80 Everything about your knife",
-		"is 100% silent. Still fully visible, though."
+		"is 100% silent, but it's still fully visible.",
+		"Thrown knives are slightly quieter when flying."
 	},
 	cost = perk_price,
 }

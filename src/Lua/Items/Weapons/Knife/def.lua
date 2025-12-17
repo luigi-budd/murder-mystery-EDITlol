@@ -161,7 +161,12 @@ weapon.thinker = function(item, p)
 		end
 		
 		if item.altfiretime == throw_tic - 1
-			S_StartSound(me, sfx_s3k76) -- intentionally audible
+			if MM_PERKS.playerHasPerk(p, MMPERK_NINJA) == 1
+				-- audible to you, silent to everyone else
+				S_StartSoundAtVolume(nil, sfx_s3k76, 255 * 4/5, p)
+			else
+				S_StartSound(me, sfx_s3k76) -- intentionally audible
+			end
 		end
 		item.altfiretime = min($ + 1, throw_tic)
 		item.damage = false
@@ -206,8 +211,10 @@ weapon.thinker = function(item, p)
 		if item.altfiretime >= throw_tic
 			item.release = true
 			item.mobj.spriteyoffset = 0
-			S_StartSound(p.mo, weapon.misssfx)
-			S_StartSound(p.mo, weapon.misssfx)
+			if not MM_PERKS.playerHasPerk(p, MMPERK_NINJA)
+				S_StartSound(p.mo, weapon.misssfx)
+				S_StartSound(p.mo, weapon.misssfx)
+			end
 			S_StopSoundByID(p.mo, sfx_s3k76)
 			--play this from the missile instead
 			--S_StartSoundAtVolume(p.mo, throw_sfx, 255 * 2/10)
@@ -218,17 +225,16 @@ weapon.thinker = function(item, p)
 			
 			item.shootable = true
 			item.shootmobj = MT_MM_KNIFE_PROJECT
-			MM.FireBullet(p, MM.Items[item.id], item, p.mo.angle, p.aiming, false)
+			local bull = MM.FireBullet(p, MM.Items[item.id], item, p.mo.angle, p.aiming, false)
 			item.shootable = false
 			item.shootmobj = MT_NULL
 			
-			for k,bull in ipairs(item.bullets)
-				if not (bull and bull.valid)
-					table.remove(item.bullets,k)
-					continue
-				end
-				bull.pitch = item.mobj.pitch
-				bull.roll = item.mobj.roll
+			bull.pitch = item.mobj.pitch
+			bull.roll = item.mobj.roll
+			bull.ghost = MM_PERKS.playerHasPerk(p, MMPERK_GHOST)
+			bull.ninja = MM_PERKS.playerHasPerk(p, MMPERK_NINJA)
+			if bull.ninja == 1
+				bull.alpha = FU/2
 			end
 			
 			--fuckkkkk
@@ -362,7 +368,21 @@ weapon.attack = function(item,p)
 			P_KillMobj(cam,item.mobj,me)
 		end
 	end
+end
+
+weapon.onhit = function(item,p,p2)
+	if not MM_PERKS.playerHasPerk(p, MMPERK_NINJA) then return end
 	
+	-- if we have ninja, play a hitmarker
+	S_StartSound(nil, sfx_khitm, p)
+end
+weapon.hitplayer = function(knife, mo)
+	if knife.ninja then return end
+	local sfx = P_SpawnGhostMobj(mo)
+	sfx.flags2 = $|MF2_DONTDRAW
+	sfx.tics = TR
+	sfx.fuse = TR
+	S_StartSound(sfx, weapon.hitsfx)
 end
 
 MM:addPlayerScript(function(p)
