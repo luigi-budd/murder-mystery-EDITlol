@@ -1,0 +1,124 @@
+# eh fuck it, lets put soc headers for the vanilla maps too
+
+LEVEL M2
+LevelName = Tidal Palace
+Music = DSZ2
+TypeOfLevel = Match,Tag
+SelectHeading = Standard
+NextLevel = M3
+SkyNum = 7
+Lua.MM_Disallow_team_versus = true
+
+Level M3
+LevelName = Thunder Citadel
+Music = CEZ2
+TypeOfLevel = Match,Tag
+SelectHeading = Standard
+NextLevel = M4
+Weather = 1
+SkyNum = 10
+Lua.MM_Disallow_team_versus = true
+
+Level M4
+LevelName = Desolate Twilight
+Music = MP_DES
+TypeOfLevel = Match,Tag
+SelectHeading = Standard
+NextLevel = M5
+SkyNum = 101
+SkyboxScale = 64
+Lua.MM_Disallow_team_versus = true
+
+Level M7
+LevelName = Sapphire Falls
+Music = MP_GHZ
+TypeOfLevel = Match,Tag
+SelectHeading = Standard
+NextLevel = M8
+SkyboxScale = 64
+SkyNum = 502
+Lua.MM_Disallow_team_versus = true
+
+Level M8
+LevelName = Diamond Blizzard
+Music = MP_AIR
+TypeOfLevel = Match,Tag
+SelectHeading = Standard
+NextLevel = M9
+Weather = 2
+SkyNum = 55
+Lua.MM_Disallow_team_versus = true
+
+Level M9
+LevelName = Celestial Sanctuary
+Music = MP_FOR
+TypeOfLevel = Match,Tag
+SelectHeading = Standard
+NextLevel = MA
+Weather = 3
+SkyboxScaleZ = 16
+SkyNum = 230
+Lua.MM_Disallow_team_versus = true
+
+# waaaaay too big
+Level MC
+Levelname = Granite Lake
+Music = MP_GLZ
+TypeOfLevel = Match,Tag
+NextLevel = MD
+SkyNum = 16
+SkyboxScale = 32
+SelectHeading = Standard
+Lua.MM_Disallow_team_versus = true
+
+Level MD
+LevelName = Summit Showdown
+Music = VSAGZ
+TypeOfLevel = Match,Tag
+NextLevel = ME
+Weather = PRECIP_SNOW
+SkyNum = 17
+SkyboxScaleX = 64
+SkyboxScaleY = 64
+SelectHeading = Standard
+Lua.MM_Disallow_team_versus = true
+
+Level ME
+Levelname = Silver Shiver
+Music = MP_WT3
+TypeOfLevel = Match,Tag
+NextLevel = MF
+SkyNum = 20
+Weather = PRECIP_SNOW
+SelectHeading = Standard
+Lua.MM_Disallow_team_versus = true
+
+Level MG
+LevelName = Pristine Shores
+Music = MP_GHZ
+TypeOfLevel = Match,Tag
+SelectHeading = Standard
+NextLevel = MH
+SkyNum = 76
+Skyboxscale = 32
+Lua.MM_Disallow_team_versus = true
+
+Level MH
+LevelName = Crystalline Heights
+Music = MP_CHZ
+TypeOfLevel = Match,Tag
+SelectHeading = Standard
+NextLevel = M0
+SkyNum = 69
+Skyboxscale = 256
+Lua.MM_Disallow_team_versus = true
+
+# unique gimmick, i love this map, but its gotta go
+Level N1
+LevelName = Midnight Abyss
+Music = MP_DM2
+NextLevel = N2
+TypeOfLevel = Match,Tag
+SkyNum = 22
+SelectHeading = Classic
+Lua.MM_Disallow_team_versus = true

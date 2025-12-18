@@ -33,6 +33,7 @@ Lua.MM_ClueAmount = 6
 Lua.MM_SingleClues = true
 Lua.MM_StormTimer = 25
 Lua.MM_StormTimer_Overtime = 20
+Lua.MM_Disallow_Team_Versus = true
 
 # @lemerksiscool
 Level H2
@@ -50,6 +51,7 @@ Selectheading = Murder Mystery
 Lua.MM_ClueAmount = 6
 Lua.MM_StormTimer_Overtime = 20
 Lua.MM_SingleClues = true
+Lua.MM_Disallow_Team_Versus = true
 
 # @pyrodiac
 level P1
@@ -74,6 +76,7 @@ Lua.MM_ClueAmount = 6
 Lua.MM_StormTimer = 25
 Lua.MM_StormTimer_Overtime = 23
 Lua.MM_StormTimer_Grace = 10
+Lua.MM_Disallow_Team_Versus = true
 
 #@glideks
 Level C0
@@ -90,6 +93,7 @@ Selectheading = Murder Mystery
 Lua.MM_ClueAmount = 6
 Lua.MM_StormTimer = 25
 Lua.MM_StormTimer_Overtime = 20
+Lua.MM_Disallow_Team_Versus = true
 
 Level C1
 LevelName = Flood Industries
@@ -119,6 +123,7 @@ Lua.MM_ClueAmount = 6
 Lua.MM_StormTimer = 30
 Lua.MM_StormTimer_Overtime = 25
 Lua.MM_StormTimer_Grace = 10
+Lua.MM_Disallow_Team_Versus = true
 
 Level C3
 LevelName = Haunted Mansion
