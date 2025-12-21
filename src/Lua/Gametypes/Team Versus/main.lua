@@ -188,6 +188,7 @@ MM.addHook("PlayerSpawn", function(p)
 	
 	--um, that aint right
 	if mm.role == MMROLE_INNOCENT
+	and not (p.mm_save.afkmode)
 		local count = MM.countPlayers()
 		if count.murderers > count.regulars
 			mm.role = MMROLE_SHERIFF
