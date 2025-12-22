@@ -165,7 +165,7 @@ weapon.thinker = function(item, p)
 				-- audible to you, silent to everyone else
 				S_StartSoundAtVolume(nil, sfx_s3k76, 255 * 4/5, p)
 			else
-				S_StartSound(me, sfx_s3k76) -- intentionally audible
+				S_StartSound(p.realmo, sfx_s3k76) -- intentionally audible
 			end
 		end
 		item.altfiretime = min($ + 1, throw_tic)
