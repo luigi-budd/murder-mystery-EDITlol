@@ -113,6 +113,14 @@ local function DropTripmine(p)
 	mine.tracer = me
 	mine.tracer_player = p
 	mine.mmteam = p.mm.role
+	
+	local gt = MM.returnGametype()
+	if gt.name ~= "Team Versus" then return end
+	if p.mm.role == MMROLE_SHERIFF
+		mine.teamcolor = SKINCOLOR_BLUE
+	else
+		mine.teamcolor = SKINCOLOR_RED
+	end
 end
 
 local TAKIS_3D_FLAGS = MF_NOGRAVITY|MF_NOCLIPHEIGHT|MF_NOCLIP|MF_SCENERY

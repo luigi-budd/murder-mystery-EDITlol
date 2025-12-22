@@ -168,6 +168,9 @@ MM.addHook("PlayerDies", function(player)
 		end
 	end
 	
+	if player.mtvs_deaths == nil
+		player.mtvs_deaths = 0
+	end
 	player.mtvs_deaths = $ + 1
 end)
 

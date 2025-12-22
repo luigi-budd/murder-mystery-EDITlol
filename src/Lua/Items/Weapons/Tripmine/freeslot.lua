@@ -368,6 +368,7 @@ local function ThreeDThinker(door)
 	else
 		local list = door.sides
 		
+		
 		for i = 1,4
 			local angle = door.angle+(FixedAngle(90*FU*(i-1)))
 			list[0+i].angle = angle+ANGLE_90
@@ -386,6 +387,10 @@ local function ThreeDThinker(door)
 			if door.fade == 10
 				list[0+i].flags2 = $|MF2_DONTDRAW
 			end
+			if door.teamcolor
+				list[0+i].color = door.teamcolor
+				list[0+i].colorized = true
+			end
 		end
 		
 		list[7].angle = door.angle
@@ -400,7 +405,6 @@ local function ThreeDThinker(door)
 		if door.fade == 10
 			list[7].flags2 = $|MF2_DONTDRAW
 		end
-		
 	end
 	
 end
@@ -454,7 +458,7 @@ addHook("MobjThinker",function(mine)
 						mine.zmoves[i], MT_PARTICLE
 					)
 					g.state = S_SHOCKWAVE1
-					g.color = SKINCOLOR_GALAXY
+					g.color = mine.teamcolor or SKINCOLOR_GALAXY
 					g.colorized = true
 					g.renderflags = $|RF_FULLBRIGHT|RF_NOCOLORMAPS
 					g.fuse = (g.tics * 2) - mine.imgonnaDIEsoon
@@ -567,10 +571,12 @@ addHook("MobjThinker",function(mine)
 			elseif aura.floorspriteslope
 				P_RemoveFloorSpriteSlope(aura)
 			end
-			
+			if mine.teamcolor
+				aura.color = mine.teamcolor
+				aura.colorized = true
+			end
 		end
 	end
-	
 end,MT_MM_TRIPMINE)
 
 local sparkle_fuse = TICRATE * 3
@@ -593,6 +599,10 @@ local function SpawnSparks(mo)
 		spark.fuse = sparkle_fuse + P_RandomRange(-5, 5)
 		spark.start = spark.fuse
 		spark.threshold = P_RandomRange(-roll_limit, roll_limit) * ANG1
+		if mo.teamcolor
+			spark.color = mo.teamcolor
+			spark.colorized = true
+		end
 		
 		P_Thrust(spark,
 			R_PointToAngle2(spark.x,spark.y, mo.x,mo.y),
@@ -748,7 +758,7 @@ addHook("TouchSpecial",function(mine,me)
 	SpawnSparks(mine)
 	SpawnSparks(me)
 	SetPurplePlanes(mine)
-	SpawnExplosions(mine,true,nil,SKINCOLOR_GALAXY)
+	SpawnExplosions(mine,true,nil, mine.teamcolor or SKINCOLOR_GALAXY)
 	ExplosionCompliment(mine)
 	
 	mine.steppedon = true
@@ -780,7 +790,7 @@ addHook("MobjDeath",function(mine,_,src,dmgt)
 	end
 	SpawnSparks(mine)
 	SetPurplePlanes(mine)
-	SpawnExplosions(mine,true,nil,SKINCOLOR_GALAXY)
+	SpawnExplosions(mine,true,nil, mine.teamcolor or SKINCOLOR_GALAXY)
 	ExplosionCompliment(mine)
 	delete3d(mine)
 	
