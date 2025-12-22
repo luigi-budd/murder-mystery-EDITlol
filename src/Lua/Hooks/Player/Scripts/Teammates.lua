@@ -43,7 +43,7 @@ return function(p)
 		or (play.mm.spectator or play.spectator)
 		--!?!?
 		or (play.mm.role ~= p.mm.role)
-			table.remove(p.mm.teammates,k)
+			--table.remove(p.mm.teammates,k)
 			p.mm.refreshteammates = true
 			continue
 		end
