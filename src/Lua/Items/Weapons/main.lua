@@ -180,6 +180,10 @@ MM.GenericHitscan = function(mo)
 		if not (mo and mo.valid) then
 			return
 		end
+		if (not mo.health) then
+			P_RemoveMobj(mo)
+			return
+		end
 		
 		--we do this so its easier to hit players from farther away, while also 
 		--being able to hit players closer up in small areas
