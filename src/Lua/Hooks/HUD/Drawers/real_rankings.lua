@@ -326,13 +326,15 @@ local function HUD_TabScoresDrawer(v)
 			v.draw(x, y, v.cachePatch("MM_PLAYERLIST_OUTLINE_SPEC"))
 		end
 	end
-	v.drawString(
-		160,
-		yroot + (TILEHEIGHT+TILEMARGIN)*((#playerlist - 1)/ROWLENGTH) + 20,
-		"\x85"..MM_N.special_count.." Murderer"..(MM_N.special_count ~= 1 and "s" or '').."\x80 this round.",
-		V_ALLOWLOWERCASE,
-		"thin-center"
-	)
+	if not (MM.returnGametype()).fill_teams then
+		v.drawString(
+			160,
+			yroot + (TILEHEIGHT+TILEMARGIN)*((#playerlist - 1)/ROWLENGTH) + 20,
+			"\x85"..MM_N.special_count.." Murderer"..(MM_N.special_count ~= 1 and "s" or '').."\x80 this round.",
+			V_ALLOWLOWERCASE,
+			"thin-center"
+		)
+	end
 end
 
 return HUD_TabScoresDrawer,"scores",100
