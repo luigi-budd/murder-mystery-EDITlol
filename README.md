@@ -79,6 +79,6 @@ If you can code or do art, hit us up at our Discord server (linked below) or hit
 **@j1sk** (266392657884872715)
 
 ## Is there an Discord server?
-Yes! https://discord.gg/J6yzyJV8Ta
+Yes! discord.gg/XVcvm97Mqx
 
 You'll be pinged whenever our test server gets updated!
