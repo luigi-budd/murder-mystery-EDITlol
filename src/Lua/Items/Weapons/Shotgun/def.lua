@@ -69,7 +69,7 @@ function weapon:attack(p)
 			* * * * *
 			  * * *
 	*/
-	for i = -2,2
+	for i = -1,1
 		--if i == 0 then continue end
 		local frac = FixedDiv((i*FU), 2*FU)
 		local ang = FixedMul(spread,frac) - FixedMul(noise, P_RandomFixed())
@@ -115,12 +115,8 @@ function weapon:attack(p)
 end
 
 weapon.bulletthinker = function(mo, i)
-	if (i >= 170)
-		mo.momz = $ - (mo.scale/3)*P_MobjFlip(mo)
-	end
-	if (i >= 230)
-		mo.momz = $ - (mo.scale/2)*P_MobjFlip(mo)
-	end
+	-- mkay
+	if i == 20 then mo.nohitscan = true; return true end
 end
 
 local scaling_factor = (FU/2)

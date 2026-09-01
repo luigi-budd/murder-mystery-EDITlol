@@ -11,10 +11,10 @@ mobjinfo[MT_MM_BULLET].sparkvfx_spokes = 2
 addHook("MobjThinker", function(mo)
 	if not mo.valid then return end
 	
-	if MM_N.dueling
+	if not mo.nohitscan
 		MM.GenericHitscan(mo)
-		return
 	end
+	if not (mo and mo.valid) then return end
 	
 	if mo.z <= mo.floorz
 	or mo.z+mo.height >= mo.ceilingz
@@ -34,7 +34,7 @@ addHook("MobjThinker", function(mo)
 	end
 	
 	local flip = P_MobjFlip(mo)
-	local speed = 200
+	local speed = 150
 	mo.momx = FixedMul(speed*cos(mo.angle), cos(mo.aiming))
 	mo.momy = FixedMul(speed*sin(mo.angle), cos(mo.aiming))
 	mo.momz = speed*sin(mo.aiming)

@@ -199,7 +199,9 @@ MM.GenericHitscan = function(mo)
 		mo.height = $ + mo.scale/2
 		
 		if def.bulletthinker
-			def.bulletthinker(mo, i)
+			if def.bulletthinker(mo, i)
+				return
+			end
 			
 			--thinker removed the bullet
 			if not (mo and mo.valid) then
