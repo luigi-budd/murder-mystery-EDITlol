@@ -163,6 +163,7 @@ MM.BulletDies = function(mo, moagainst, line)
 	end
 end
 
+
 MM.GenericHitscan = function(mo)
 	if not mo.valid then return end
 	
@@ -175,6 +176,8 @@ MM.GenericHitscan = function(mo)
 	mo.momz = 32*sin(mo.aiming)
 	*/
 	mo.bullframe = A
+	local startpos = Vec3.MobjPosToVec(mo)
+	mo.startpos = startpos
 	
 	for i = 0,255 do
 		if not (mo and mo.valid) then
@@ -187,11 +190,9 @@ MM.GenericHitscan = function(mo)
 		
 		--we do this so its easier to hit players from farther away, while also 
 		--being able to hit players closer up in small areas
-		if mo.type ~= MT_MM_LASER -- WHATEVER! DONT CARE!
-			local gs = P_SpawnGhostMobj(mo)
-			gs.flags2 = $|MF2_DONTDRAW
-			gs.fuse = 1
-		end
+		local gs = P_SpawnGhostMobj(mo)
+		gs.flags2 = $|MF2_DONTDRAW
+		gs.fuse = 1
 		
 		mo.radius = $ + mo.scale/4
 		if not (mo and mo.valid)
@@ -214,6 +215,8 @@ MM.GenericHitscan = function(mo)
 		if mo.z <= mo.floorz
 		or mo.z+mo.height >= mo.ceilingz
 		and (i > 0) then
+			mo.forcehit = true
+			MM.CheckLagReduction(mo, startpos, Vec3.MobjPosToVec(mo), mo.radius, mo.height, MM.BulletHit)
 			MM.BulletDies(mo)
 			P_RemoveMobj(mo)
 			return
@@ -244,6 +247,8 @@ MM.GenericHitscan = function(mo)
 		
 		--dont step up stairs
 		if (mo.eflags & MFE_JUSTSTEPPEDDOWN)
+			mo.forcehit = true
+			MM.CheckLagReduction(mo, startpos, Vec3.MobjPosToVec(mo), mo.radius, mo.height, MM.BulletHit)
 			MM.BulletDies(mo)
 			P_RemoveMobj(mo)
 			return			
@@ -251,6 +256,8 @@ MM.GenericHitscan = function(mo)
 		
 		if FixedHypot(mo.momx,mo.momy) == 0
 			if caught >= 8
+				mo.forcehit = true
+				MM.CheckLagReduction(mo, startpos, Vec3.MobjPosToVec(mo), mo.radius, mo.height, MM.BulletHit)
 				MM.BulletDies(mo)
 				P_RemoveMobj(mo)
 				return
@@ -265,14 +272,38 @@ MM.GenericHitscan = function(mo)
 	end
 end
 
+-- fires a ray from startpos to endpos, checking if any players intersected it
+MM.CheckLagReduction = function(mo, startpos, endpos, radius, height, callback)
+	for p in players.iterate
+		if p.spectator then return end
+		local me = p.mo
+		if not (me and me.valid and me.health) then continue end
+		
+		local snapshot = p.mm.lagsnapshots[mo.spawnlatency]
+		local intersect = P_ClosestPointOnLine3D(Vec3.New(snapshot.x,snapshot.y,snapshot.z), startpos, endpos)
+		
+		if abs(intersect.x - snapshot.x) <= snapshot.radius + radius
+		and abs(intersect.y - snapshot.y) <= snapshot.radius + radius
+		and (
+			snapshot.z <= intersect.z + height -- check overhead
+			and snapshot.z+snapshot.height >= intersect.z -- check underhead
+		)
+			callback(mo, me)
+			return
+		end
+	end
+end
+
 MM.BulletHit = function(ring,pmo)
 	if not (ring and ring.valid) then return end
 	if not (pmo and pmo.valid) then return end
 	if (pmo == ring.target) then return end
 	if not (ring.target and ring.target.valid) then return end
 	
-	if ring.z > pmo.z+pmo.height then return end
-	if pmo.z > ring.z+ring.height then return end
+	if not ring.forcehit
+		if ring.z > pmo.z+pmo.height then return end
+		if pmo.z > ring.z+ring.height then return end
+	end
 	if not (pmo.health) then return end
 	
 	if not (pmo.player and pmo.player.valid)

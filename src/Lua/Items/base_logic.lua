@@ -149,6 +149,7 @@ MM.FireBullet = function(p,def,item, angle, aiming, callhooks)
 		bullet.origin = item
 		bullet.eflags = $|(p.mo.eflags & MFE_VERTICALFLIP)
 		bullet.finalkillsfx = item.finalkillsfx or sfx_none
+		bullet.spawnlatency = p.cmd.latency + 1
 		
 		P_InstaThrust(bullet, bullet.angle, 32*cos(aiming))
 		bullet.momz = 32*sin(aiming)

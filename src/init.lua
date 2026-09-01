@@ -102,6 +102,7 @@ dofile "Maps/exec"
 dofile "Objects/NeoRings/define"
 dofile "Objects/Vanilla Mobj Tweaks/Monitors"
 dofile "Menus/exec"
+dofile "Libs/Vec3" -- lol
 
 -- fool-proofing
 -- basically if you reference a variable thats not in the local table

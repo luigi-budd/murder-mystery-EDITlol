@@ -22,6 +22,8 @@ addHook("MobjMoveCollide", MM.BulletHit, MT_MM_REVOLV_BULLET)
 addHook("MobjMoveBlocked", function(ring, m,l)
 	if not (ring and ring.valid) then return end
 	
+	ring.forcehit = true
+	MM.CheckLagReduction(ring, ring.startpos, Vec3.MobjPosToVec(ring), ring.radius, ring.height, MM.BulletHit)
 	MM.BulletDies(ring, m,l)
 	P_RemoveMobj(ring)
 end, MT_MM_REVOLV_BULLET)
