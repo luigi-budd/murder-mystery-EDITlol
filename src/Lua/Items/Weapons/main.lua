@@ -187,9 +187,11 @@ MM.GenericHitscan = function(mo)
 		
 		--we do this so its easier to hit players from farther away, while also 
 		--being able to hit players closer up in small areas
-		local gs = P_SpawnGhostMobj(mo)
-		gs.flags2 = $|MF2_DONTDRAW
-		gs.fuse = 1
+		if mo.type ~= MT_MM_LASER -- WHATEVER! DONT CARE!
+			local gs = P_SpawnGhostMobj(mo)
+			gs.flags2 = $|MF2_DONTDRAW
+			gs.fuse = 1
+		end
 		
 		mo.radius = $ + mo.scale/4
 		if not (mo and mo.valid)
@@ -219,7 +221,11 @@ MM.GenericHitscan = function(mo)
 		
 		if i % 4 == 0 then
 			local ghs = P_SpawnGhostMobj(mo)
-			ghs.frame = (mo.bullframe % E)|FF_SEMIBRIGHT
+			if mo.type ~= MT_MM_LASER
+				ghs.frame = (mo.bullframe % E)|FF_SEMIBRIGHT
+			else
+				ghs.frame = $|FF_FULLBRIGHT
+			end
 			ghs.fuse = $*2
 			ghs.blendmode = AST_ADD
 			P_SetOrigin(ghs, ghs.x,ghs.y,ghs.z)

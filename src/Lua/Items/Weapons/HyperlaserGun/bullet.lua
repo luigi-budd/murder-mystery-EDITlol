@@ -28,7 +28,12 @@ end
 local off = 4
 addHook("MobjThinker", function(mo)
 	if not (mo and mo.valid) then return end
-
+	
+	if not mo.nohitscan
+		MM.GenericHitscan(mo)
+	end
+	if not (mo and mo.valid) then return end
+	
 	if mo.z <= mo.floorz
 	or mo.z+mo.height >= mo.ceilingz
 	or (mo.eflags & MFE_JUSTSTEPPEDDOWN) then

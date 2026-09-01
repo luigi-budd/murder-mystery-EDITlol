@@ -40,6 +40,11 @@ weapon.dropsfx = sfx_gndrop
 weapon.allowdropmobj = true
 weapon.aimtrail = true
 
+weapon.bulletthinker = function(mo, i)
+	-- mkay
+	if i == 80 then mo.nohitscan = true; return true end
+end
+
 MM.addHook("CorpseSpawn", function(me, mo)
 	local inf = mo.inflictor
 	if not (inf and inf.valid) then return end
