@@ -72,6 +72,8 @@ local player_variables =
 	refreshteammates = false,
 	
 	effects = {},
+	
+	lagsnapshots = {},
 }
 
 setmetatable(player_variables, MM.player_metatable)
