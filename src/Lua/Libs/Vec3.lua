@@ -144,6 +144,10 @@ rawset(_G, "P_ClosestPointOnLine3D", function(p, lstart, lend)
 	
 	-- d = R_PointToDist2(0, lend.z, R_PointToDist2(lend.x, lend.y, lstart.x, lstart.y), lstart.z)
 	d = R_PointTo3DDist(lstart.x,lstart.y,lstart.z, lend.x,lend.y,lend.z)
+	if d == 0
+		return lstart
+	end
+	
 	local n = Vec3.New(V.x, V.y, V.z) / d
 	t = Vec3.Dot(n, c)
 	
