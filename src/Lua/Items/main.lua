@@ -2,6 +2,15 @@
 for i = 0,3
 	sfxinfo[freeslot("sfx_mmbw"..i)].caption = "Bullet whips"
 end
+-- sure LOL
+freeslot("SPR_BULLETSPARK")
+states[freeslot("S_MM_BULLETIMP")] = {
+	sprite = SPR_BULLETSPARK,
+	frame = A|FF_ANIMATE|FF_FULLBRIGHT,
+	tics = 6,
+	var1 = 5,
+	var2 = 1,
+}
 
 // WEAPON SYSTEM BY @j1sk ON DISCORD
 // ORIGINALLY FOR ZE2

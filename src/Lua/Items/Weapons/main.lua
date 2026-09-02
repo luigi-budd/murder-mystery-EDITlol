@@ -43,18 +43,25 @@ MM.BulletDies = function(mo, moagainst, line)
 		angle = R_PointToAngle2(line.v1.x, line.v1.y, line.v2.x, line.v2.y)
 	end
 	
+	local floormode = false
+	if mo.z <= mo.floorz
+	or mo.z+mo.height >= mo.ceilingz
+		floormode = true
+	end
+	
+	local spark = P_SpawnMobjFromMobj(mo, 0,0,0, MT_PARTICLE)
+	spark.state = S_MM_BULLETIMP
+	if mo.info.sparkvfx_func then
+		mo.info.sparkvfx_func(spark)
+	end
+	
+	--[[
 	local spokes = mo.info.sparkvfx_spokes or 8
 	local fa = FixedDiv(360*FU, spokes*FU)
 	local speed = 6*mo.scale
 	
 	local rev_x = P_ReturnThrustX(nil, mo.angle, -mo.scale * 3)
 	local rev_y = P_ReturnThrustY(nil, mo.angle, -mo.scale * 3)
-	
-	local floormode = false
-	if mo.z <= mo.floorz
-	or mo.z+mo.height >= mo.ceilingz
-		floormode = true
-	end
 	
 	for i = 1, spokes
 		local my_ang = FixedAngle(fa * i)
@@ -91,6 +98,7 @@ MM.BulletDies = function(mo, moagainst, line)
 		
 		P_SetOrigin(spark, spark.x, spark.y, spark.z)
 	end
+	]]
 	
 	--bullet holes
 	if (moagainst and moagainst.valid) then return end
@@ -177,6 +185,7 @@ MM.CheckBulletWhips = function(shot)
 	if p.spectator then return end
 	local me = p.mo
 	if not (me and me.valid and me.health) then return end
+	if (shot.target == me) then return end
 	
 	local use_iframes = MM.Gametypes[MM_N.gametype].allow_iframes
 	if (p.powers[pw_flashing] and use_iframes)
@@ -205,21 +214,46 @@ MM.CheckBulletWhips = function(shot)
 	whippedframe = leveltime
 end
 
+local function P_Lerp(frac, from, to)
+	return from + FixedMul(to - from, frac)
+end
+local function TraceRay(lstart,lend, iter,clr, iscaleadd, fscaleadd, totalstep)
+	for i = 1,iter
+		local frac = FixedDiv(i*FU, iter*FU)
+		local t = P_SpawnMobj(
+			P_Lerp(frac, lstart.x, lend.x),
+			P_Lerp(frac, lstart.y, lend.y),
+			P_Lerp(frac, lstart.z, lend.z),
+			MT_THOK
+		)
+		t.sprite = SPR_BGLS
+		t.frame = X|FF_FULLBRIGHT|FF_ADD
+		t.scale = ($ / 9) + P_Lerp(frac, iscaleadd, fscaleadd)
+		t.fuse = 2 + (totalstep/52)
+		t.tics = t.fuse
+		t.flags = $|MF_NOBLOCKMAP
+		t.destscale = 0
+		t.scalespeed = FixedDiv(t.scale, t.fuse*FU)
+		t.color = clr
+		totalstep = $ + 1
+	end
+	return totalstep
+end
 MM.GenericHitscan = function(mo)
 	if not mo.valid then return end
 	
 	local def = MM.Items[mo.origin.id]
 	local caught = 0
 	
-	/*
-	mo.momx = FixedMul(32*cos(mo.angle), cos(mo.aiming))
-	mo.momy = FixedMul(32*sin(mo.angle), cos(mo.aiming))
-	mo.momz = 32*sin(mo.aiming)
-	*/
 	mo.bullframe = A
 	local startpos = Vec3.MobjPosToVec(mo)
 	mo.startpos = startpos
+	local lastpos = Vec3.MobjPosToVec(mo)
 	
+	local vfxiterations = mo.info.bullettracer_num or 18
+	local vfxclr = mo.info.bullettracer_color or SKINCOLOR_ORANGE
+	local vfxscale = 0
+	local vfxstep = 0
 	for i = 0,255 do
 		if not (mo and mo.valid) then
 			return
@@ -264,16 +298,13 @@ MM.GenericHitscan = function(mo)
 		end
 		
 		if i % 4 == 0 then
-			local ghs = P_SpawnGhostMobj(mo)
-			if mo.type ~= MT_MM_LASER
-				ghs.frame = (mo.bullframe % E)|FF_SEMIBRIGHT
-			else
-				ghs.frame = $|FF_FULLBRIGHT
-			end
-			ghs.fuse = $*2
-			ghs.blendmode = AST_ADD
-			P_SetOrigin(ghs, ghs.x,ghs.y,ghs.z)
-			mo.bullframe = $ + 1
+			local thispos = {x = mo.x, y = mo.y, z = mo.z}
+			local scaleinc = FU/64
+			vfxstep = TraceRay(thispos, lastpos, vfxiterations,vfxclr, vfxscale, vfxscale + scaleinc, $)
+			lastpos.x = mo.x
+			lastpos.y = mo.y
+			lastpos.z = mo.z
+			vfxscale = $ + scaleinc
 		end
 		
 		P_XYMovement(mo)
