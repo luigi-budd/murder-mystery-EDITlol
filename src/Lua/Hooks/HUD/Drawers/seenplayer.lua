@@ -1,5 +1,3 @@
-local sglib = MM.require "Libs/sglib"
-
 local draw_name = ""
 local draw_tag = ""
 local g_seenplayer
@@ -61,9 +59,9 @@ local function DrawSeeName(v,p,c)
 			flip = -1
 		end
 		
-		local to_screen = sglib.ObjectTracking(v,p,c,{ x = g_mo.x, y = g_mo.y, z = g_mo.z+(( (g_mo.height*3)/2)*flip ) })
+		local to_screen = K_GetScreenCoords(v,p,c, { x = g_mo.x, y = g_mo.y, z = g_mo.z+(( (g_mo.height*3)/2)*flip ) }, {anglecliponly = true})
 		
-		if to_screen and to_screen.onScreen then
+		if to_screen and to_screen.onscreen then
 			MMHUD.interpolate(v, #g_seenplayer)
 			v.drawString(to_screen.x, to_screen.y-4*to_screen.scale, draw_name, V_ALLOWLOWERCASE|V_GREENMAP|V_50TRANS, "thin-fixed-center")
 			v.drawString(to_screen.x, to_screen.y-4*to_screen.scale+10*FU, draw_tag, V_ALLOWLOWERCASE|V_BLUEMAP|V_50TRANS, "thin-fixed-center")

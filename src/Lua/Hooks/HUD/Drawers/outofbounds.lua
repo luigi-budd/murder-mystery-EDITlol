@@ -1,5 +1,4 @@
 local TR = TICRATE
-local sglib = MM.require "Libs/sglib"
 
 local function HUD_OOBDrawer(v,p,c)
 	if not MM:isMM() then return end

@@ -2,7 +2,6 @@ local perk_name = "X-Ray"
 local perk_price = 525 --1500
 
 local cv_fov = CV_FindVar("fov")
-local sglib = MM.require "Libs/sglib"
 
 MM_PERKS[MMPERK_XRAY] = {
 	drawer = function(v,p,cam, order)
@@ -61,7 +60,7 @@ MM_PERKS[MMPERK_XRAY] = {
 			local play = item.player
 
 			local patch = v.cachePatch("MM_SHOWDOWNMARK")
-			local w2s = sglib.ObjectTracking(v, p, cam, play.mo)
+			local w2s = K_GetScreenCoords(v,p,cam, play.mo, {anglecliponly = true})
 
 			MMHUD.interpolate(v,#play)
 			v.drawScaled(

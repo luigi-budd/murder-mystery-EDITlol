@@ -1,5 +1,4 @@
 --i swear we had this before...
-local sglib = MM.require "Libs/sglib"
 local function clamp(minimum,value,maximum)
 	if maximum < minimum
 		local temp = minimum
@@ -29,30 +28,15 @@ local function wrap(v,p,c)
 			z = att.z
 		}
 		
-		-- i think its fine if we pass a table instead, sglib doesnt need
-		-- anything outside of coords anyways
-		local to_screen = sglib.ObjectTracking(v,p,c,dest)
+		local to_screen = K_GetScreenCoords(v,p,c, dest, {anglecliponly = true})
 		local x = to_screen.x
 		local y = to_screen.y
 		local patch = att.patch
 		
-		local base = to_screen.base
-		
-		local offscreen = false
-		if to_screen.x + sch_w <= 0 or to_screen.x + sch_w >= sc_w
-			offscreen = true
-		end
-		/*
-		if to_screen.y + sch_h <= 0 or to_screen.y + sch_h >= (sc_h * 6/5)
-			offscreen = true
-		end
-		*/
-		local angdiff = base.viewangle - R_PointToAngle2(base.viewx,base.viewy, dest.x,dest.y)
-		if abs(angdiff) > FixedAngle(base.fov)
-			offscreen = true
-		end
+		local offscreen = not to_screen.onscreen
 		
 		if offscreen
+			local da = to_screen.camAngle - R_PointToAngle2(to_screen.camPos.x,to_screen.camPos.y, dest.x,dest.y)
 			local borderx = 30
 			local bordery = 50
 			local center = {
@@ -63,8 +47,8 @@ local function wrap(v,p,c)
 				x = (160 - borderx)*FU + sch_w,
 				y = (100 - bordery)*FU + sch_h,
 			}
-			x = center.x + FixedMul(scr.x, sin(to_screen.angle))
-			y = center.y - FixedMul(scr.y, cos(to_screen.angle))
+			x = center.x + FixedMul(scr.x, sin(da))
+			y = center.y - FixedMul(scr.y, cos(da))
 			
 			-- whatever
 			if (patch == "MM_BEARTRAP_OUT")

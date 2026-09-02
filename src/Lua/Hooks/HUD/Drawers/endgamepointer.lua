@@ -1,4 +1,3 @@
-local sglib = MM.require "Libs/sglib"
 local roles = MM.require "Variables/Data/Roles"
 
 local snipe_count = 0
@@ -53,16 +52,16 @@ local function HUD_EndGameDrawer(v,p,c)
 	
 	if MM_N.end_killed and MM_N.end_killed.valid
 	and (MM_N.end_killed.player and MM_N.end_killed.player.valid)
-		local w2s = sglib.ObjectTracking(v,p,c,MM_N.end_killed,false,true)
+		local w2s = K_GetScreenCoords(v,p,c, MM_N.end_killed, {anglecliponly = true})
 
-		if w2s.onScreen
+		if w2s.onscreen
 			local isme = ''
 			if MM_N.end_killed == consoleplayer.realmo
 				isme = "\x80 (you!)"
 			end
 			
 			v.drawString(w2s.x,
-				w2s.y - 32*w2s.scale,
+				w2s.y + 32*w2s.scale,
 				roles[MM_N.end_killed.player.mm.role].name..isme,
 				roles[MM_N.end_killed.player.mm.role].color,
 				"thin-fixed-center"
@@ -72,9 +71,9 @@ local function HUD_EndGameDrawer(v,p,c)
 	end
 
 	if MM_N.end_killer and MM_N.end_killer.valid and MM_N.end_killer.health and MM_N.end_killer.player
-		local w2s = sglib.ObjectTracking(v,p,c,MM_N.end_killer,false,true)
+		local w2s = K_GetScreenCoords(v,p,c, MM_N.end_killer, {anglecliponly = true})
 
-		if w2s.onScreen
+		if w2s.onscreen
 			local isme = ''
 			if MM_N.end_killer == consoleplayer.realmo
 				isme = "\x80 (you!)"
@@ -93,13 +92,13 @@ local function HUD_EndGameDrawer(v,p,c)
 				end
 				
 				v.drawString(w2s.x,
-					w2s.y - 64*w2s.scale,
+					w2s.y + 32*w2s.scale,
 					name..isme,
 					map,
 					"thin-fixed-center"
 				)
 				v.drawString(w2s.x,
-					w2s.y - 64*w2s.scale - 8*FU,
+					w2s.y + 32*w2s.scale - 8*FU,
 					MM_N.end_killer.player.name,
 					map|V_ALLOWLOWERCASE,
 					"thin-fixed-center"
@@ -107,7 +106,7 @@ local function HUD_EndGameDrawer(v,p,c)
 			--Innocents kill each other
 			else
 				v.drawString(w2s.x,
-					w2s.y - 64*w2s.scale,
+					w2s.y + 32*w2s.scale,
 					roles[MM_N.end_killer.player.mm.role].name..isme,
 					roles[MM_N.end_killer.player.mm.role].color,
 					"thin-fixed-center"

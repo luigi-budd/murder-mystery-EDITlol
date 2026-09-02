@@ -1,6 +1,5 @@
 local TR = TICRATE
 
-local sglib = MM.require("Libs/sglib")
 local shallowCopy = MM.require "Libs/shallowCopy"
 
 local buttontotext = {
@@ -38,7 +37,7 @@ local function HUD_InteractDrawer(v,p,cam)
 		
 		local trans = (k ~= #placehold_inter and V_50TRANS or 0)
 		do
-			local w2s = sglib.ObjectTracking(v,p,cam,mo)
+			local w2s = K_GetScreenCoords(v,p,cam, mo, {anglecliponly = true})
 			
 			local goingaway = inter.hud.goingaway and inter.timesinteracted
 			local timetic = FixedDiv(

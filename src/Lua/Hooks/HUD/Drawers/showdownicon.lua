@@ -1,4 +1,3 @@
-local sglib = MM.require "Libs/sglib"
 local int_ease = MM.require "Libs/int_ease"
 
 local function HUD_Wrap(v,p,c)
@@ -18,9 +17,9 @@ local function HUD_Wrap(v,p,c)
 			if P_CheckSight(p.mo,player.mo) then continue end
 			
 			local icon = v.cachePatch("MM_SHOWDOWNMARK") --v.getSprite2Patch(player.skin, SPR2_LIFE, false, A, 0)
-			local to_screen = sglib.ObjectTracking(v,p,c,player.mo)
+			local to_screen = K_GetScreenCoords(v,p,c, player.mo, {anglecliponly = true})
 			
-			if not to_screen.onScreen then continue end
+			if not to_screen.onscreen then continue end
 			
 			local dist = R_PointToDist2(c.x, c.y, player.mo.x, player.mo.y)
 			local t = max(0, min(FixedDiv(dist, 1500*FU), FU))
@@ -34,16 +33,6 @@ local function HUD_Wrap(v,p,c)
 		end
 		return
 	end
-
-	// TODO: make marker towards shotgun if dropped
-	/* local icon = v.getSprite2Patch(player.skin, SPR2_LIFE, false, A, 0)
-	local to_screen = sglib.ObjectTracking(v,p,c,player.mo)
-
-	if not to_screen.onScreen then continue end
-
-	local dist = R_PointToDist2(c.x, c.y, player.mo.x, player.mo.y)
-	local t = max(0, min(FixedDiv(dist, 1500*FU), FU))
-	local trans = int_ease(t, 10, 0) */
 end
 
 return function(v,p,c)

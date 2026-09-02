@@ -1,6 +1,4 @@
 --i swear we had this before...
-local sglib = MM.require "Libs/sglib"
-
 local function HUD_DrawGoHere(v,p,c)
 	if not (p.mo and p.mo.valid) then return end
 	if (p.spectator) then return end
@@ -15,9 +13,9 @@ local function HUD_DrawGoHere(v,p,c)
 		if P_CheckSight(p.mo,dest) then return end
 		
 		local icon = v.cachePatch("MM_SHOWDOWNMARK") --v.getSprite2Patch(player.skin, SPR2_LIFE, false, A, 0)
-		local to_screen = sglib.ObjectTracking(v,p,c,dest)
+		local to_screen = K_GetScreenCoords(v,p,c, dest, {anglecliponly = true})
 
-		if not to_screen.onScreen then return end
+		if not to_screen.onscreen then return end
 		
 		v.drawScaled(to_screen.x,
 			to_screen.y,
