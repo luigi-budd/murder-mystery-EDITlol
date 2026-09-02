@@ -236,6 +236,7 @@ weapon.thinker = function(item, p)
 			if bull.ninja == 1
 				bull.alpha = FU/2
 			end
+			bull.finalkillsfx = weapon.hitsfx
 			
 			--fuckkkkk
             item.hit = 0
