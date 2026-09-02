@@ -61,9 +61,9 @@ states[S_MM_TRIPMINE_EXPLODE] = {
 
 local function SpawnExplosions(mine, doquake, docount, colorized)
 	if doquake
-		P_StartQuake(30*FU, TICRATE*2,
+		P_StartQuake(60*FU, TICRATE / 3,
 			{mine.x, mine.y, mine.z},
-			550*mine.scale
+			550*mine.scale * 2
 		)
 	end
 	
@@ -139,6 +139,10 @@ sfxinfo[SafeFreeslot("sfx_subsme")] = {
 	caption = "Explosion",
 	flags = SF_X8AWAYSOUND
 }
+sfxinfo[SafeFreeslot("sfx_subse2")] = {
+	caption = "Explosion",
+	flags = SF_X8AWAYSOUND
+}
 sfxinfo[SafeFreeslot("sfx_subsmt")].caption = "/"
 
 states[SafeFreeslot("S_MM_TRIPMINE_HELD")] = {
@@ -169,16 +173,31 @@ mobjinfo[SafeFreeslot("MT_MM_TRIPMINE")] = {
 	radius = 16*FRACUNIT,
 	flags = MF_SOLID|MF_RUNSPAWNFUNC|MF_SHOOTABLE
 }
+local function playdeathsound(sfx, mine)
+	if not MM.Gametypes[MM_N.gametype].tamer_tripmine
+		-- LOL
+		S_StartSound(sfx, mine.info.deathsound)
+		S_StartSound(sfx, mine.info.deathsound)
+		S_StartSound(sfx, mine.info.deathsound)
+	else
+		S_StartSound(sfx, sfx_subse2)
+		S_StartSound(sfx, sfx_subse2)
+		S_StartSound(sfx, sfx_subse2)
+	end
+end
 
 local function ExplosionCompliment(mine)
-	if MM.Gametypes[MM_N.gametype].tamer_tripmine then return end
-	
+	local tamer = MM.Gametypes[MM_N.gametype].tamer_tripmine
 	local sfx = P_SpawnGhostMobj(mine)
 	sfx.fuse = 3 * TICRATE
 	sfx.tics = sfx.fuse
 	sfx.flags2 = $|MF2_DONTDRAW
-	S_StartSound(sfx, sfx_mmdie0)
-	S_StartSound(sfx, sfx_mmdie0)
+	if not tamer
+		S_StartSound(sfx, sfx_mmdie0)
+		S_StartSound(sfx, sfx_mmdie0)
+	else
+		S_StartSoundAtVolume(sfx, sfx_mmdie0, 255 / 4)
+	end
 	
 	local a = mine.angle + ANGLE_45
 	local spr_scale = FU * 2
@@ -198,20 +217,22 @@ local function ExplosionCompliment(mine)
 		bam.colorized = true
 		bam.blendmode = AST_SUBTRACT
 		
-		local wave = P_SpawnMobjFromMobj(mine,0,0,0,MT_THOK)
-		P_SetMobjStateNF(wave, wavestate)
-		wave.spritexscale = FixedMul($, spr_scale)
-		wave.spriteyscale = wave.spritexscale
-		wave.renderflags = $|rflags
-		wave.angle = a + ANGLE_90 * i
-		wave.tics = wavetime
-		wave.fuse = wavetime
-		wave.destscale = wave.scale * 6
-		wave.scalespeed = FixedDiv(wave.destscale - wave.scale, wavetime*FU)
-		
-		wave.color = SKINCOLOR_GALAXY
-		wave.colorized = true
-		wave.blendmode = AST_ADD
+		if not tamer
+			local wave = P_SpawnMobjFromMobj(mine,0,0,0,MT_THOK)
+			P_SetMobjStateNF(wave, wavestate)
+			wave.spritexscale = FixedMul($, spr_scale)
+			wave.spriteyscale = wave.spritexscale
+			wave.renderflags = $|rflags
+			wave.angle = a + ANGLE_90 * i
+			wave.tics = wavetime
+			wave.fuse = wavetime
+			wave.destscale = wave.scale * 6
+			wave.scalespeed = FixedDiv(wave.destscale - wave.scale, wavetime*FU)
+			
+			wave.color = SKINCOLOR_GALAXY
+			wave.colorized = true
+			wave.blendmode = AST_ADD
+		end
 	end
 end
 
@@ -734,12 +755,6 @@ addHook("TouchSpecial",function(mine,me)
 	sfx.flags2 = $|MF2_DONTDRAW
 	sfx.fuse = 12*TR
 	
-	S_StartSound(sfx,mine.info.deathsound)
-	if not MM.Gametypes[MM_N.gametype].tamer_tripmine
-		S_StartSound(sfx,mine.info.deathsound)
-		S_StartSound(sfx,mine.info.deathsound)
-	end
-	
 	if mine.aura and mine.aura.valid
 		P_RemoveMobj(mine.aura)
 	end
@@ -753,7 +768,8 @@ addHook("TouchSpecial",function(mine,me)
 	me.color = SKINCOLOR_GALAXY
 	me.stormkilledme = true
 	me.colorized = true
-	S_StartSound(me,mine.info.deathsound)
+	playdeathsound(mine, mine)
+	playdeathsound(me, mine)
 	
 	SpawnSparks(mine)
 	SpawnSparks(me)
@@ -779,11 +795,7 @@ addHook("MobjDeath",function(mine,_,src,dmgt)
 	sfx.flags2 = $|MF2_DONTDRAW
 	sfx.fuse = 12*TR
 	
-	S_StartSound(sfx,mine.info.deathsound)
-	if not MM.Gametypes[MM_N.gametype].tamer_tripmine
-		S_StartSound(sfx,mine.info.deathsound)
-		S_StartSound(sfx,mine.info.deathsound)
-	end
+	playdeathsound(sfx, mine)
 	
 	if mine.aura and mine.aura.valid
 		P_RemoveMobj(mine.aura)
@@ -836,7 +848,7 @@ addHook("MobjDeath",function(mine,_,src,dmgt)
 		me.color = SKINCOLOR_GALAXY
 		me.stormkilledme = true
 		me.colorized = true
-		S_StartSound(me,mine.info.deathsound)
+		playdeathsound(me, mine)
 	end
 	
 	-- this sets off the tripmine chain reactions
