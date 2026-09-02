@@ -1,3 +1,8 @@
+-- umm i think we can just freeslot these here
+for i = 0,3
+	sfxinfo[freeslot("sfx_mmbw"..i)].caption = "Bullet whips"
+end
+
 // WEAPON SYSTEM BY @j1sk ON DISCORD
 // ORIGINALLY FOR ZE2
 

@@ -163,6 +163,47 @@ MM.BulletDies = function(mo, moagainst, line)
 	end
 end
 
+local whippedframe = -1
+local function R_PointTo3DDist(x1,y1,z1, x2,y2,z2)
+	return FixedHypot(FixedHypot(x2 - x1, y2 - y1), z2 - z1)
+end
+
+MM.CheckBulletWhips = function(shot)
+	if not (shot and shot.valid and shot.health) then return end
+	local sfxid = P_RandomRange(sfx_mmbw0,sfx_mmbw3)
+	
+	local p = displayplayer
+	if not (p and p.valid) then return end
+	if p.spectator then return end
+	local me = p.mo
+	if not (me and me.valid and me.health) then return end
+	
+	local use_iframes = MM.Gametypes[MM_N.gametype].allow_iframes
+	if (p.powers[pw_flashing] and use_iframes)
+		return
+	end
+	
+	local friendly = false
+	if (shot.target and shot.target.valid)
+	and p.mm.role == shot.target.player.mm.role
+	and shot.target.player.mm.role ~= MMROLE_INNOCENT
+		friendly = true
+	end
+	if friendly then return end
+	if shot.whipped then return end
+	if whippedframe == leveltime then return end
+	
+	if R_PointTo3DDist(shot.x,shot.y,shot.z, me.x,me.y,me.z + me.height*4/5) > 200*shot.scale then return end
+	
+	local sfx = P_SpawnGhostMobj(shot)
+	sfx.flags2 = $|MF2_DONTDRAW
+	sfx.fuse = TR
+	sfx.tics = sfx.fuse
+	S_StartSoundAtVolume(sfx, sfxid, 255, p)
+	-- S_StartSoundAtVolume(sfx, sfxid, 255, dp)
+	shot.whizzed = true
+	whippedframe = leveltime
+end
 
 MM.GenericHitscan = function(mo)
 	if not mo.valid then return end
@@ -264,6 +305,7 @@ MM.GenericHitscan = function(mo)
 			end
 			caught = $ + 1
 		end
+		MM.CheckBulletWhips(mo)
 	end
 	
 	if mo and mo.valid then
