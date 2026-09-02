@@ -288,8 +288,33 @@ MM.CheckLagReduction = function(mo, startpos, endpos, radius, height, callback)
 			snapshot.z <= intersect.z + height -- check overhead
 			and snapshot.z+snapshot.height >= intersect.z -- check underhead
 		)
-			callback(mo, me)
+			callback(mo, me, startpos, endpos)
 			return
+		end
+	end
+
+	if MMCAM and MMCAM.TOTALCAMS
+		for k,cam in pairs(MMCAM.TOTALCAMS)
+			if not (cam and cam.valid) then continue end
+			if not (cam.health) then continue end
+			if not (cam.args) then continue end
+			if (cam.args.viewpoint) then continue end
+			if not (cam.args.hitbox and cam.args.hitbox.valid) then continue end
+			
+			-- like the guy
+			-- the yoshi swallowing guy
+			local hbox = cam.args.hitbox
+			local intersect = P_ClosestPointOnLine3D(Vec3.New(hbox.x,hbox.y,hbox.z), startpos, endpos)
+			
+			if abs(intersect.x - hbox.x) <= hbox.radius + radius
+			and abs(intersect.y - hbox.y) <= hbox.radius + radius
+			and (
+				hbox.z <= intersect.z + height -- check overhead
+				and hbox.z+hbox.height >= intersect.z -- check underhead
+			)
+				callback(mo, me, startpos, endpos)
+				return
+			end
 		end
 	end
 end
