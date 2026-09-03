@@ -2,6 +2,9 @@
 for i = 0,3
 	sfxinfo[freeslot("sfx_mmbw"..i)].caption = "Bullet whips"
 end
+for i = 0,3
+	sfxinfo[freeslot("sfx_mmbi"..i)].caption = "Bullet impact"
+end
 -- sure LOL
 freeslot("SPR_BULLETSPARK")
 states[freeslot("S_MM_BULLETIMP")] = {

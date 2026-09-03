@@ -27,7 +27,7 @@ MM.BulletDies = function(mo, moagainst, line)
 	
 	if not mo.nodeathsound
 		if mo.info.deathsound == nil then
-			S_StartSound(sfx,sfx_turhit)
+			S_StartSound(sfx,P_RandomRange(sfx_mmbi0,sfx_mmbi3))
 		else
 			S_StartSound(sfx,mo.info.deathsound)
 		end

@@ -38,6 +38,7 @@ return function()
 
 	if not (MM_N.waiting_start_time) then
 		MM_N.restartingformap = true
+		MM_N.forced_gametype = 2 -- magic number Lol!
 		COM_BufInsertText(server, "map "..G_BuildMapName(gamemap).." -f")
 		MM_N.waiting_for_players = false
 	end
