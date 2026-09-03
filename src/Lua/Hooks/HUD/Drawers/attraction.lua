@@ -56,7 +56,7 @@ local function wrap(v,p,c)
 				v.drawScaled(x, y,
 					FU/2,
 					v.getSpritePatch(SPR_BGLS, W, 0, 
-						InvAngle(angdiff) + ANGLE_90
+						InvAngle(da) + ANGLE_90
 					),
 					0
 				)
