@@ -26,7 +26,7 @@ MM.BulletDies = function(mo, moagainst, line)
 	sfx.fuse = TICRATE
 	
 	if not mo.nodeathsound
-		if mo.info.deathsound == nil then
+		if (mo.info.deathsound == nil or mo.info.deathsound == sfx_none) then
 			S_StartSound(sfx,P_RandomRange(sfx_mmbi0,sfx_mmbi3))
 		else
 			S_StartSound(sfx,mo.info.deathsound)
