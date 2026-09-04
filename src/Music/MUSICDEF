@@ -26,6 +26,14 @@ Soundtestpage = 1
 Soundtestcond = 0
 BPM = 200
 
+Lump SHWDW4
+Title = Life_on_the_Blast
+Alttitle = Showdown_4
+Authors = ZrUltra
+Soundtestpage = 1
+Soundtestcond = 0
+BPM = 220
+
 Lump MMTF2O
 Title = Sniper_Approved.
 Alttitle = TF2_Theme
