@@ -56,6 +56,15 @@ local teamversus_mode = MM.RegisterGametype("Team Versus", "team_versus", {
 			return
 		end
 		
+		-- overtime, check which team has been wiped out
+		if not MM_N.allow_respawn
+			local count = MM.countPlayers()
+			if count.murderers == 0 or count.regulars == 0
+				return true, (count.murderers > count.regulars) and 2 or 1
+			end
+			-- otherwise, use score limit
+		end
+		
 		if (MM_N.tvs_mscore >= MM_N.tvs_pointlimit)
 		or (MM_N.tvs_sscore >= MM_N.tvs_pointlimit)
 			if not playedsound
