@@ -11,6 +11,13 @@ states[freeslot("S_MM_KNIFE_SPIN")] = {
 	tics = 4,
 	nextstate = S_MM_KNIFE_SPIN
 }
+states[freeslot("S_MM_KNIFE_SPARK")] = {
+	sprite = freeslot("SPR_KNIFETELEGRAPH"),
+    frame = 0|FF_ANIMATE|FF_FULLBRIGHT,
+	var1 = 8,
+	var2 = 1,
+	tics = (8),
+}
 
 local function impactfx(mo)
 	mo.momx,mo.momy,mo.momz = 0,0,0
@@ -107,7 +114,7 @@ addHook("MobjThinker",function(mo)
 	if not S_SoundPlaying(mo, sfx_kfly)
 		local vol = 255
 		if mo.ninja
-			vol = $ / 3
+			vol = $ / 2
 		end
 		S_StartSoundAtVolume(mo, sfx_kfly, vol)
 	end
@@ -122,11 +129,19 @@ addHook("MobjThinker",function(mo)
 	end
 	*/
 	
+	MM.CheckBulletWhips(mo)
 	for i = 1,3
 		P_XYMovement(mo)
 		if not (mo and mo.valid) then return end
 		P_ZMovement(mo)
 		if not (mo and mo.valid) then return end
+		
+		if (mo.eflags & MFE_JUSTSTEPPEDDOWN)
+			impactfx(mo)
+			MM.BulletDies(mo)
+			P_KillMobj(mo)
+			return
+		end
 	end
 	
 	do --if leveltime % 3 == 0

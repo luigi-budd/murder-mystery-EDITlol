@@ -173,6 +173,19 @@ weapon.thinker = function(item, p)
 		item.hit = 0
 		
 		do --if not item.altfiretime == throw_tic
+			if item.altfiretime == 1
+				local top_layer = P_SpawnMobjFromMobj(item.mobj, 0,0,0, MT_OVERLAY)
+				top_layer.state = S_MM_KNIFE_SPARK
+				top_layer.fuse = top_layer.tics
+				top_layer.spritexscale = FU * 3/4
+				top_layer.spriteyscale = top_layer.spritexscale
+				top_layer.dispoffset = 200
+				--top_layer.spriteyoffset = 140*FU / 2
+				--top_layer.spritexoffset = -70*FU / 2
+				top_layer.tracer = item.mobj
+				top_layer.target = item.mobj
+			end
+			
 			if not (item.ghost and item.ghost.valid)
 				local g = P_SpawnGhostMobj(item.mobj)
 				g.tics = 12
