@@ -40,6 +40,6 @@ end
 
 addTheme "srb2"
 
-rawset(_G,"MM_PLAYER_STORMMAX",5*TICRATE)
+rawset(_G,"MM_PLAYER_STORMMAX",7*TICRATE)
 
 dofile("Variables/Metatables/Player/mm.lua")
