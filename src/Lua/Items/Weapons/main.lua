@@ -402,6 +402,14 @@ MM.BulletHit = function(ring,pmo)
 		if ring.z > pmo.z+pmo.height then return end
 		if pmo.z > ring.z+ring.height then return end
 	end
+	
+	-- check solid objects
+	if (pmo.flags & (MF_SOLID|MF_SHOOTABLE) == MF_SOLID)
+		MM.BulletDies(ring)
+		P_KillMobj(ring)
+		return
+	end
+	
 	if not (pmo.health) then return end
 	
 	if not (pmo.player and pmo.player.valid)
