@@ -291,12 +291,6 @@ local function SpawnLaser(point,i, debug, x,y, ang, scale, clr, rawangle, dist, 
 		end
 	end
 	*/
-	
-	--okay ig... there could be a better way to do this
-	if not S_SoundPlaying(laser,sfx_laser)
-	and not MM_N.gameover
-		S_StartSound(laser,sfx_laser)
-	end
 end
 
 local function SpawnDebugLasers(point,dist)
@@ -468,7 +462,31 @@ local function FXHandle(point,dist)
 		garg.frame = ($ &~FF_FRAMEMASK)|B|FF_SEMIBRIGHT
 		point.garg = garg
 	end
-
+	
+	if (displayplayer and displayplayer.valid and displayplayer.realmo and displayplayer.realmo.valid)
+		local p = displayplayer
+		local me = p.realmo
+		if not (point.sfx and point.sfx.valid)
+			local sfx = P_SpawnMobjFromMobj(
+				point,
+				0,0,0,
+				MT_RAY
+			)
+			sfx.tics = -1
+			sfx.fuse = -1
+			sfx.flags2 = $|MF2_DONTDRAW
+			point.sfx = sfx
+		end
+		local sfx = point.sfx
+		
+		local ang = R_PointToAngle2(point.x, point.y, me.x, me.y)
+		local x = point.x + P_ReturnThrustX(nil,ang, dist)
+		local y = point.y + P_ReturnThrustY(nil,ang, dist)
+		P_MoveOrigin(sfx, x,y, me.z)
+		if not S_SoundPlaying(sfx,sfx_mmsta) and not MM_N.gameover
+			S_StartSound(sfx,sfx_mmsta)
+		end
+	end
 end
 
 return function(self)
