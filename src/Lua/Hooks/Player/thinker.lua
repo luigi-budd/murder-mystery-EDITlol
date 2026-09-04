@@ -172,7 +172,7 @@ addHook("PlayerThink", function(p)
 			P_KillMobj(p.mo)
 		end
 	else
-		p.mm.oob_ticker = max($ - 4, 0)
+		p.mm.oob_ticker = max($ - 2, 0)
 		if (p.mo.health)
 		and (displayplayer and displayplayer.mo and displayplayer.mo.valid)
 		and (p == displayplayer)
