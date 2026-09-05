@@ -136,6 +136,7 @@ NextLevel = C2
 Weather = PRECIP_RAIN
 SkyNum = 20
 Lua.MM_ClueAmount = 5
+Lua.mm_storm_nomigrating = true
 
 #@j1sk
 Level V0

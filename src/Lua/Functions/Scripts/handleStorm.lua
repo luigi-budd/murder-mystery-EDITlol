@@ -105,6 +105,10 @@ local function Init(point)
 	end
 	point.storm_graceperiod = grace
 	
+	if mapheaderinfo[gamemap].mm_storm_nomigrating ~= nil
+		point.storm_nomigrating = true
+	end
+	
 	SetDestRadius(point, totaltime, point.storm_destradius)
 	
 	point.init = true
@@ -593,6 +597,23 @@ return function(self)
 
 	if point.storm_radius ~= point.storm_destradius then return end
 	if point.otherpoints == nil or #point.otherpoints < 2 then return end
+	
+	-- only shrink
+	if point.storm_nomigrating
+		if point.movecooldown
+			point.movecooldown = $ - 1
+			if point.movecooldown == 0
+				SetDestRadius(point, 5*TICRATE, point.storm_destradius/2)
+			end
+		else
+			point.movecooldown = 10*TICRATE
+			MMHUD:PushToTop(8*TICRATE,
+				"\x89Storm eye shrinks in",
+				"\x82".."10\x80 seconds"
+			)
+			S_StartSound(nil,sfx_mmsmig)
+		end
+	end
 	
 	if point.movecooldown ~= nil
 		if point.movecooldown
