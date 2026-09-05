@@ -60,6 +60,8 @@ local teamversus_mode = MM.RegisterGametype("Team Versus", "team_versus", {
 		if not MM_N.allow_respawn
 			local count = MM.countPlayers()
 			if count.murderers == 0 or count.regulars == 0
+			-- 1v1s dont end games on team wipeouts
+			and (count.total > 2)
 				return true, (count.murderers > count.regulars) and 2 or 1
 			end
 			-- otherwise, use score limit
@@ -78,6 +80,7 @@ local teamversus_mode = MM.RegisterGametype("Team Versus", "team_versus", {
 		elseif (MM_N.tvs_sscore >= MM_N.tvs_pointlimit)
 			return true, 1
 		end
+		return false
 	end;
 	hudgoals = function(p, flags)
 		return {
