@@ -81,6 +81,9 @@ MMRadio.songs = {
         realname = "overtime"
 	},
 }
+addHook("NetVars",function(n)
+	MMRadio.songs = n($)
+end)
 
 radio.id = "radio"
 radio.category = "Item"

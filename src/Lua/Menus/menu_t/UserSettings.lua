@@ -116,7 +116,8 @@ MenuLib.addMenu({
                         end,
                         tooltip = {
                             "Sets your radio's song when dropped. \x82Valid songs:",
-                            "tacos, macca, overtime, fellas, sonicr, elevator, portal"
+                            "tacos, macca, overtime, fellas, sonicr, elevator, portal",
+							"You can also put in any existing song."
                         },
                         typesound = sfx_oldrad
                     })				
