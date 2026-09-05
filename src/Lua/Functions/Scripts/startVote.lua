@@ -1,6 +1,12 @@
 return function(self)
 	if MM_N.voting then return end
 	
+	-- Lol!
+	local count = MM.countPlayers()
+	if count.total == 2
+		MM_N.forced_gametype = 2
+	end
+
 	MM_N.voting = true
 	MM_N.end_ticker = 0
 	
