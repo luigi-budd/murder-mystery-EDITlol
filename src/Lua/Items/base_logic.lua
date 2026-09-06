@@ -154,11 +154,19 @@ MM.FireBullet = function(p,def,item, angle, aiming, callhooks)
 		P_InstaThrust(bullet, bullet.angle, 32*cos(aiming))
 		bullet.momz = 32*sin(aiming)
 		
-		P_SetOrigin(bullet, 
-			p.mo.x + P_ReturnThrustX(nil,p.mo.angle, 4*FU),
-			p.mo.y + P_ReturnThrustY(nil,p.mo.angle, 4*FU),
-			(p.mo.z + (41*p.mo.height/48))-8*FU
-		)
+		if P_MobjFlip(p.mo) == -1
+			P_SetOrigin(bullet, 
+				p.mo.x + P_ReturnThrustX(nil,p.mo.angle, 4*FU),
+				p.mo.y + P_ReturnThrustY(nil,p.mo.angle, 4*FU),
+				(p.mo.z + (41*p.mo.height/48))-8*FU
+			)
+		else
+			P_SetOrigin(bullet, 
+				p.mo.x + P_ReturnThrustX(nil,p.mo.angle, 4*FU),
+				p.mo.y + P_ReturnThrustY(nil,p.mo.angle, 4*FU),
+				(p.mo.z + (7*p.mo.height/48))+8*FU
+			)
+		end
 		table.insert(item.bullets, bullet)
 	end
 	if callhooks
