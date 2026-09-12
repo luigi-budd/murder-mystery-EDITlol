@@ -154,7 +154,7 @@ MM.FireBullet = function(p,def,item, angle, aiming, callhooks)
 		P_InstaThrust(bullet, bullet.angle, 32*cos(aiming))
 		bullet.momz = 32*sin(aiming)
 		
-		if P_MobjFlip(p.mo) == -1
+		if P_MobjFlip(p.mo) == 1
 			P_SetOrigin(bullet, 
 				p.mo.x + P_ReturnThrustX(nil,p.mo.angle, 4*FU),
 				p.mo.y + P_ReturnThrustY(nil,p.mo.angle, 4*FU),
