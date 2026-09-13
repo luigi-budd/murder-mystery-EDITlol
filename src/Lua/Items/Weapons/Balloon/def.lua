@@ -12,7 +12,7 @@ weapon.cooldown_time = TICRATE
 weapon.range = FU
 weapon.zrange = FU
 weapon.position = {
-	x = FU,
+	x = -FU,
 	y = 0,
 	z = 2*FU
 }
@@ -46,6 +46,8 @@ weapon.thinker = function(item, player)
 			end
 		end
 	end
+	
+	item.mobj.color = player.mo.color
 end
 
 
