@@ -284,7 +284,7 @@ COM_AddCommand("MM_EquipPerk", function(p, slot, newperk)
 	
 end)
 
-COM_AddCommand("MM_AddExtraRings", function(p, rings)
+COM_AddCommand("MM_AddExtraCoins", function(p, rings)
 	if not MM:isMM() then return end
 	if (tonumber(rings) == nil) then return end
 	
