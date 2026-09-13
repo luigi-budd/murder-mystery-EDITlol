@@ -8,7 +8,7 @@ return function(p)
 		p.rings = 0
 		p.mm_save.rings = wrapadd($, 1)
 		p.mm.rings = wrapadd($, 1)
-		S_StartSound(nil, mobjinfo[MT_RING].deathsound, p)
+		S_StartSoundAtVolume(nil, mobjinfo[MT_RING].deathsound, 255 * 3/4, p)
 		
 		p.mm_save.ringstopay = $ - 1
 	end

@@ -19,9 +19,15 @@ return function(v,p)
 	
 	if (ticker > TR)
 	and MMHUD.info_count ~= p.mm.ringspaid
+		local prevcount = MMHUD.info_count
+
 		MMHUD.info_count = ease.outquad(FU/(2*TR)*(ticker-TR), 0, p.mm.ringspaid)
 		if ticker == 3*TR
 			MMHUD.info_count = p.mm.ringspaid
+		end
+
+		if prevcount ~= MMHUD.info_count
+			S_StartSoundAtVolume(nil, mobjinfo[MT_RING].deathsound, 255 * 3/4)
 		end
 	end
 	

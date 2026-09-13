@@ -99,6 +99,8 @@ local function HUD_InfoDrawer(v, stplyr)
 		local slidein = 0
 		local func = v.slideDrawScaled
 		local Sfunc = v.slideDrawString
+		local payoutstring = ""
+		local ring_string = format_int(tostring(rings))
 		
 		if splitscreen then
 			if secondarydisplayplayer == stplyr then
@@ -130,6 +132,16 @@ local function HUD_InfoDrawer(v, stplyr)
 				V_SNAPTOLEFT|V_SNAPTOTOP|V_GREENMAP,
 				"fixed-right", true
 			)	
+		elseif p.mm_save.ringstopay
+			local topay = p.mm_save.ringstopay
+			payoutstring = "  \x83+"..topay
+			Sfunc(
+				x + 15*FU - slidein + v.stringWidth(ring_string,0,"normal")*FU,
+				y + 2*FU + yoff,
+				payoutstring,
+				V_SNAPTOLEFT|V_SNAPTOTOP,
+				"thin-fixed", true
+			)
 		end
 		
 		local origin_size = FixedDiv(16*FU, v.cachePatch("MMRING").width*FU) -- Scale to 16 pixels
@@ -149,7 +161,6 @@ local function HUD_InfoDrawer(v, stplyr)
 			V_SNAPTOLEFT|V_SNAPTOTOP
 		)
 		
-		local ring_string = format_int(tostring(rings))
 		Sfunc(x + 15*FU - slidein,
 			y + FU + yoff,
 			ring_string,
@@ -157,7 +168,7 @@ local function HUD_InfoDrawer(v, stplyr)
 			"fixed", true
 		)
 		MMHUD.info_xpos = max($,
-			(x/FU) + 15 + v.stringWidth(ring_string,0,"normal")
+			(x/FU) + 15 + v.stringWidth(ring_string,0,"normal") + v.stringWidth(payoutstring,0,"thin")
 		)
 	end
 end
