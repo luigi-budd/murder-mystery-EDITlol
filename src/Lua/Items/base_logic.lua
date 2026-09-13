@@ -691,6 +691,9 @@ MM:addPlayerScript(function(p)
 			end
 			hitsomething = true
 			
+			local spark = P_SpawnMobjFromMobj(p2.mo, 0,0,0, MT_PARTICLE)
+			spark.state = S_MM_BULLETIMP
+			
 			if item.onlyhitone
 				item.hit = 0
 				break
