@@ -128,7 +128,7 @@ MM_PERKS[MMPERK_XRAY] = {
 		"",
 		
 		"\x82Secondary:\x80 See everyone through walls",
-		"every 55 seconds!."
+		"every 55 seconds!"
 	},
 	cost = perk_price,
 }

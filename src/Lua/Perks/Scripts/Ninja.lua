@@ -26,6 +26,7 @@ MM_PERKS[MMPERK_NINJA] = {
 	end,
 	
 	icon = "MM_PI_NINJA",
+	icon_scale = FU/2,
 	name = perk_name,
 
 	description = {
