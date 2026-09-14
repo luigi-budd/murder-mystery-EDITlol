@@ -134,7 +134,7 @@ local function HUD_InfoDrawer(v, stplyr)
 			)	
 		elseif p.mm_save.ringstopay
 			local topay = p.mm_save.ringstopay
-			payoutstring = "  \x83+"..topay
+			payoutstring = "  \x83+ $"..topay
 			Sfunc(
 				x + 15*FU - slidein + v.stringWidth(ring_string,0,"normal")*FU,
 				y + 2*FU + yoff,

@@ -9,9 +9,9 @@ return function(props)
 		name = props.name or "Item"..MM.Shop.libcre,
 		price = props.price or 0,
 		category = props.category or 0,
+		multiple = props.multiple,
 		
 		purchase = props.purchase,
-		equip = props.equip,
 	})
 	
 	--add this item's id to the categories list of items

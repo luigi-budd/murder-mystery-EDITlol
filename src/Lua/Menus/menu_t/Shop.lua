@@ -132,6 +132,26 @@ MMHUD.menus.tryPerkEquip = function(perk_id, slot, mm_slot)
 	MenuLib.initPopup(MenuLib.findMenu("Shop_Equipping"))
 end
 
+local chance_catid, chance_catptr = MM.Shop.addCategory("Chance")
+local chanceadd_id = MM.Shop.addItem({
+	name = "AddMurdererChance",
+	price = 700,
+	category = chance_catid,
+	multiple = true,
+	purchase = function(p)
+		p.mm_save.murderer_chance_multi = $ + 2
+	end
+})
+local chanceremove_id = MM.Shop.addItem({
+	name = "RemoveMurdererChance",
+	price = 500,
+	category = chance_catid,
+	multiple = true,
+	purchase = function(p)
+		p.mm_save.murderer_chance_multi = max($ - 2, 1)
+	end
+})
+
 MMHUD.menus.equippop = {
 	timer = 0,
 	last = 0,
@@ -407,7 +427,6 @@ MenuLib.addMenu({
 					)
 					worky = $ + 4
 				end
-				
 			end
 			
 			if (perk_t and perk_t.cost ~= nil)
@@ -431,7 +450,7 @@ MenuLib.addMenu({
 			
 		--draw our equipped perks
 		else
-			local center_x = ((BASEVIDWIDTH/2) + menu.width/4) - 5
+			local center_x = ((BASEVIDWIDTH/2) + menu.width/4) - 7
 			y = props.corner_y + 27
 			
 			v.drawString(center_x - 34,
@@ -447,19 +466,87 @@ MenuLib.addMenu({
 				true
 			)
 			
-			v.drawString(center_x + (34*2),
+			v.drawString(center_x + (34*2) + 2,
 				y + 43,
 				"Secondary",
 				V_ALLOWLOWERCASE|V_YELLOWMAP,
 				"thin-right"
 			)
 			MMHUD.menus.drawPerkItem(v,
-				center_x + 34,
+				center_x + 36,
 				y,
 				consoleplayer.mm_save.sec_perk,
 				true
 			)
-		
+			
+			-- chance time
+			local leftx = center_x - 34
+			y = $ + 105
+			local p = consoleplayer
+			v.drawString(leftx,y,
+				("Murderer Multi.:\n%dx"):format(p.mm_save.murderer_chance_multi),
+				V_REDMAP|V_ALLOWLOWERCASE|V_RETURN8, "thin"
+			)
+			MenuLib.addButton(v, {
+				x = leftx,
+				y = y + 20,
+				
+				width = 50,
+				height = 11,
+				
+				name = "\x83+2x\x80 ($700)",
+				color = 13,
+				outline = 19,
+				
+				pressFunc = function()
+					if MMHUD.menus.trybuy.tics then return end
+					local item_t = MM.Shop.items[chanceadd_id]
+					local res
+					local price = item_t.price
+					if (item_t.priceadjust ~= nil)
+						res = item_t.priceadjust(p)
+						if tonumber(res) ~= nil then price = res; end
+					end
+					
+					if (consoleplayer.mm_save.rings < price)
+						S_StartSound(nil, sfx_lose, consoleplayer)
+						cant_buy = TICRATE
+						return
+					end
+					
+					MMHUD.menus.tryBuyItem(chanceadd_id)
+				end
+			})
+			MenuLib.addButton(v, {
+				x = leftx + 50 + 4,
+				y = y + 20,
+				
+				width = 50,
+				height = 11,
+				
+				name = "\x85-2x\x80 ($560)",
+				color = 13,
+				outline = 19,
+				
+				pressFunc = function()
+					if MMHUD.menus.trybuy.tics then return end
+					local item_t = MM.Shop.items[chanceremove_id]
+					local res
+					local price = item_t.price
+					if (item_t.priceadjust ~= nil)
+						res = item_t.priceadjust(p)
+						if tonumber(res) ~= nil then price = res; end
+					end
+					
+					if (consoleplayer.mm_save.rings < price)
+						S_StartSound(nil, sfx_lose, consoleplayer)
+						cant_buy = TICRATE
+						return
+					end
+					
+					MMHUD.menus.tryBuyItem(chanceremove_id)
+				end
+			})
 		end
 	end
 })

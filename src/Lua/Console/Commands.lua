@@ -224,7 +224,6 @@ COM_AddCommand("MM_EquipPerk", function(p, slot, newperk)
 		return 
 	end
 	
-	
 	slot = string.lower($)
 	
 	do

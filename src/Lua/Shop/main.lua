@@ -22,10 +22,13 @@ MM.Shop.items = {
 		name = string,
 		price = int,
 		category = int, (id)
+		-- if true, the player can buy
+		-- multiple of this item
+		multiple = boolean, 
 		
 		--"hooks"
-		purchase = func,
-		equip = func,
+		priceadjust = function(player) -> newprice,
+		purchase = function(player)
 	}
 	*/
 }
