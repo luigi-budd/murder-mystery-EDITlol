@@ -44,8 +44,10 @@ local teamversus_mode = MM.RegisterGametype("Team Versus", "team_versus", {
 	melees = {"sword", "knife"};
 	rare_items = {"tripmine", "beartrap", "balloon", "luger"};
 	thinker = function()
+		local count = MM.countPlayers()
+		
 		if (MM_N.time <= 0 or MM_N.showdown)
-		and MM_N.allow_respawn then
+		and MM_N.allow_respawn and (count.total > 2) then
 			MM_N.allow_respawn = false
 			S_StartSound(nil, sfx_s3k9c)
 			respawn_anim = RESPAWNTIME
