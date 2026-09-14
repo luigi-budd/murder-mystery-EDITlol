@@ -57,6 +57,7 @@ dofile(path.."Trap")
 dofile(path.."Ghost")
 dofile(path.."XRay")
 dofile(path.."Swap")
+dofile(path.."Sleight")
 
 --helpers
 local itemid_to_perkid = {}
@@ -74,4 +75,4 @@ end
 MM_PERKS.itemid_to_perkid = itemid_to_perkid
 MM_PERKS.perkid_to_itemid = perkid_to_itemid
 
-MM_PERKS.num_perks = 8
+MM_PERKS.num_perks = 9

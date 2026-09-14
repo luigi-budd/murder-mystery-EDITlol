@@ -101,11 +101,11 @@ addHook("MobjThinker",function(mo)
 		mo.nosmoke = true
 		mo.nodeathsound = true
 		
-		--speed
+		local speed = (mo.sleight) and (115*FU / 4) or mo.info.speed
 		P_InstaThrust(mo, mo.angle,
-			FixedMul(mo.info.speed, cos(mo.aiming))
+			FixedMul(speed, cos(mo.aiming))
 		)
-		mo.momz = FixedMul(mo.info.speed, sin(mo.aiming))
+		mo.momz = FixedMul(speed, sin(mo.aiming))
 		if mo.ninja ~= 1
 			S_StartSound(mo, sfx_cdfm35)
 		end

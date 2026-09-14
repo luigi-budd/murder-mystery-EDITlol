@@ -92,6 +92,7 @@ end)
 
 --item_t btw, get mobj from item->mobj
 local throw_tic = (TICRATE * 5/4)
+local fast_throwtic = (TICRATE * 3/4)
 local throw_sfx = sfx_cdfm35
 local charge_vol = 255 * 3/5
 weapon.thinker = function(item, p)
@@ -153,6 +154,7 @@ weapon.thinker = function(item, p)
 		item.release = nil
 	end
 	
+	local throw_tic = (MM_PERKS.playerHasPerk(p, MMPERK_SLEIGHT)) and fast_throwtic or throw_tic
 	if charging
 	and not item.release
 	and not item.throwcooldown
@@ -246,6 +248,7 @@ weapon.thinker = function(item, p)
 			bull.roll = item.mobj.roll
 			bull.ghost = MM_PERKS.playerHasPerk(p, MMPERK_GHOST)
 			bull.ninja = MM_PERKS.playerHasPerk(p, MMPERK_NINJA)
+			bull.sleight = MM_PERKS.playerHasPerk(p, MMPERK_SLEIGHT)
 			if bull.ninja == 1
 				bull.alpha = FU/2
 			end
@@ -310,7 +313,7 @@ weapon.drawer = function(v, p,item, x,y,scale,flags, selected, active)
 		maxtime = weapon.cooldown_time - 1
 	elseif item.altfiretime
 		timer = item.altfiretime
-		maxtime = throw_tic
+		maxtime = (MM_PERKS.playerHasPerk(p, MMPERK_SLEIGHT)) and fast_throwtic or throw_tic
 	end
 	
 	if maxtime ~= 0

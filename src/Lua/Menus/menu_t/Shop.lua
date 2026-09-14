@@ -394,7 +394,7 @@ MenuLib.addMenu({
 				
 				x = $ + 37
 				
-				if (i == 4)
+				if (i % 4 == 0)
 					x = props.corner_x + 6
 					y = $ + 46
 				end
