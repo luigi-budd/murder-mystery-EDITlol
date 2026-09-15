@@ -111,6 +111,7 @@ MM_PERKS[MMPERK_GHOST] = {
 				me.mm_overlay.color = me.color
 				me.mm_overlay.anim_duration = me.anim_duration
 				me.mm_overlay.alpha = max($, me.alpha)
+				me.mm_overlay.flags = $ &~MF_NOTHINK
 				
 				if me.alpha >= FU
 					P_RemoveMobj(me.mm_overlay)
