@@ -8,9 +8,16 @@ local xraytics = 0
 sfxinfo[freeslot("sfx_mmsnr")].caption = "\x89X-Ray ping\x80"
 
 local function perk_thinker(p, freq)
+	if MM_N.gameover then return end
+	if (MM_N.showdown) then return end
+	if (MM_N.dueling) then return end
+	if (p.spectator) then return end
+	
 	xraytics = max($ - 1, 0)
 	if (leveltime > 0 and leveltime % freq == 0)
-		xraytics = 8 * TR
+		if (p == displayplayer)
+			xraytics = 8 * TR
+		end
 		S_StartSound(nil, sfx_mmsnr, p)
 	end
 end
@@ -54,8 +61,8 @@ MM_PERKS[MMPERK_XRAY] = {
 			if not (play.mo.health) then continue end
 			if (play.mm.role == MMROLE_MURDERER) then continue end
 			
-			if (P_CheckSight(me, play.mo)) then continue end
 			local dist = R_PointToDist(play.mo.x,play.mo.y)
+			if dist < 512*FU and P_CheckSight(me, play.mo) then continue end
 			
 			/*
 			do
@@ -132,6 +139,10 @@ MM_PERKS[MMPERK_XRAY] = {
 	},
 	cost = perk_price,
 }
+
+MM.addHook("PlayerInit", do)
+	xraytics = 0
+end)
 
 local id = MM.Shop.addItem({
 	name = perk_name,
